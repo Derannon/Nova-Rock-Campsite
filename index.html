@@ -1203,12 +1203,15 @@ const LAT = 47.900991;
 const LNG = 17.08796;
 
 // 4. URL zu einem Foto des Camps (relativ oder absolut)
+//    z.B. "fotos/camp.jpg" oder "https://i.imgur.com/XXXXX.jpg"
 const CAMP_IMAGE_URL = "fotos/camp.jpg";
 
 // 5. Optional: URL zu einem Standort-Bild / Geländekarte
+//    Leer lassen = nicht anzeigen
 const MAP_IMAGE_URL = "fotos/Standort.png";
 
 // 6. Spotify Playlist-ID
+//    URL: https://open.spotify.com/playlist/XXXXXX  → ID ist das XXXXXX
 const SPOTIFY_PLAYLIST_ID = "2OH5uA1XF39Ehe2Zzl1cet";
 
 // 7. Festival-Tage (ISO-Format YYYY-MM-DD)
@@ -1221,6 +1224,7 @@ const FESTIVAL_DAYS = [
 ];
 
 // 8. Camp-Mitglieder
+//    photo: relativer Pfad oder URL. Leer lassen → emoji wird angezeigt
 const MEMBERS = [
   {
     name: "Andreas",
@@ -1262,6 +1266,7 @@ const MEMBERS = [
     fact: "Schläft sogar beim lautesten Beat durch 😴",
     photo: "fotos/Michael.jpg",
   },
+  // ← Weitere Mitglieder hier ergänzen!
 ];
 
 // 9. Aufgaben für den Task-Roller
@@ -1292,6 +1297,10 @@ const TASKS = [
 const COOLDOWN_SEC = 10;
 
 // 11. FIREBASE KONFIGURATION
+//     Hole dir diese Werte aus: console.firebase.google.com
+//     → Dein Projekt → Einstellungen ⚙️ → Deine Apps → Web-App
+//     Solange die Werte "YOUR_..." enthalten → Firebase inaktiv
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyCItIZEtDOpUngEgIxFnb0YkYLz9k6890c",
   authDomain: "nova-rock-26.firebaseapp.com",
