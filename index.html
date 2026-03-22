@@ -7,8 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.11.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.11.0/firebase-database-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
   <style>
@@ -859,20 +859,20 @@ const CAMP_NAME = "Outthink the Drinkers; Outdrink the Thinkers";
 const FESTIVAL_LABEL = "NovaRock 2026";
 
 // 3. GPS-Koordinaten eures Camps
-const LAT = 51.1234;
-const LNG = 12.5678;
+const LAT = 47.900991;
+const LNG = 17.08796;
 
 // 4. URL zu einem Foto des Camps (relativ oder absolut)
 //    z.B. "fotos/camp.jpg" oder "https://i.imgur.com/XXXXX.jpg"
-const CAMP_IMAGE_URL = "fotos/camp.jpg";
+const CAMP_IMAGE_URL = "fotos/camp.png";
 
 // 5. Optional: URL zu einem Standort-Bild / Geländekarte
 //    Leer lassen = nicht anzeigen
-const MAP_IMAGE_URL = "";
+const MAP_IMAGE_URL = "fotos/Standort.png";
 
 // 6. Spotify Playlist-ID
 //    URL: https://open.spotify.com/playlist/XXXXXX  → ID ist das XXXXXX
-const SPOTIFY_PLAYLIST_ID = "2OH5uA1XF39Ehe2Zzl1cet?";
+const SPOTIFY_PLAYLIST_ID = "2OH5uA1XF39Ehe2Zzl1cet";
 
 // 7. Festival-Tage (ISO-Format YYYY-MM-DD)
 const FESTIVAL_DAYS = [
@@ -887,7 +887,7 @@ const FESTIVAL_DAYS = [
 //    photo: relativer Pfad oder URL. Leer lassen → emoji wird angezeigt
 const MEMBERS = [
   {
-    name: "Max Mustermann",
+    name: "Andreas Beer",
     role: "Chief Beer Officer",
     emoji: "🍺",
     bio: "Seit 2019 dabei und hat noch nie ein Camp-Frühstück verpasst. Kennt jeden Weg, jeden Trick.",
@@ -895,7 +895,7 @@ const MEMBERS = [
     photo: "",
   },
   {
-    name: "Lisa Beispiel",
+    name: "Sophie Höltge",
     role: "Head of Vibes",
     emoji: "🎵",
     bio: "Programmiert die Playlist und tanzt dabei selbst schon im Voraus.",
@@ -903,7 +903,23 @@ const MEMBERS = [
     photo: "",
   },
   {
-    name: "Tom Test",
+    name: "Thomas Heyer",
+    role: "Grillmeister",
+    emoji: "🔥",
+    bio: "Waltet über den Grill mit eiserner Hand – und Zange. Sein Steak ist Legende.",
+    fact: "Schläft sogar beim lautesten Beat durch 😴",
+    photo: "",
+  },
+  {
+    name: "Sina Heyer",
+    role: "Grillmeister",
+    emoji: "🔥",
+    bio: "Waltet über den Grill mit eiserner Hand – und Zange. Sein Steak ist Legende.",
+    fact: "Schläft sogar beim lautesten Beat durch 😴",
+    photo: "",
+  },
+  {
+    name: "Michael Hüttich",
     role: "Grillmeister",
     emoji: "🔥",
     bio: "Waltet über den Grill mit eiserner Hand – und Zange. Sein Steak ist Legende.",
@@ -938,21 +954,21 @@ const TASKS = [
 ];
 
 // 10. Cooldown in Sekunden zwischen zwei Bier-Klicks
-const COOLDOWN_SEC = 30;
+const COOLDOWN_SEC = 10;
 
 // 11. FIREBASE KONFIGURATION
 //     Hole dir diese Werte aus: console.firebase.google.com
 //     → Dein Projekt → Einstellungen ⚙️ → Deine Apps → Web-App
 //     Solange die Werte "YOUR_..." enthalten → Firebase inaktiv
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey:            "AIzaSyCItIZEtDOpUngEgIxFnb0YkYLz9k6890c",
-  authDomain:        "nova-rock-26.firebaseapp.com",
-  databaseURL:       "https://nova-rock-26-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId:         "nova-rock-26",
-  storageBucket:     "nova-rock-26.firebasestorage.app",
+  apiKey: "AIzaSyCItIZEtDOpUngEgIxFnb0YkYLz9k6890c",
+  authDomain: "nova-rock-26.firebaseapp.com",
+  databaseURL: "https://nova-rock-26-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "nova-rock-26",
+  storageBucket: "nova-rock-26.firebasestorage.app",
   messagingSenderId: "264570290154",
-  appId:             "1:264570290154:web:105d70979c6cd82a9dbc93",
-  measurementId:     "G-6QGFHD1NRG,
+  appId: "1:264570290154:web:105d70979c6cd82a9dbc93",
 };
 
 /* ============================================================
