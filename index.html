@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🏕️ Camp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <style>
+    /* =====================================================
+       CSS VARIABLES & RESET
+    ===================================================== */
+    :root {
+      --bg:      #0b0b12;
+      --surface: #14141e;
+      --surf2:   #1c1c28;
+      --surf3:   #242434;
+      --accent:  #ff6b35;
+      --gold:    #ffd166;
+      --teal:    #06d6a0;
+      --text:    #f0e6d3;
+      --muted:   #7a7a96;
+      --border:  rgba(255,107,53,0.22);
+      --glow:    0 0 30px rgba(255,107,53,0.2);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; }
+
+    /* =====================================================
+       STARFIELD BACKGROUND
+    ===================================================== */
+    #stars {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 0; overflow: hidden;
+    }
+    .star {
+      position: absolute; border-radius: 50%;
+      background: #fff;
+      animation: twinkle var(--dur,3s) ease-in-out infinite var(--delay,0s);
+      opacity: 0;
+    }
+    @keyframes twinkle {
+      0%,100% { opacity:0; transform:scale(1); }
+      50%      { opacity:var(--op,.7); transform:scale(1.3); }
+    }
+    /* Slow campfire glow blobs */
+    .glow-blob {
+      position: fixed; border-radius: 50%;
+      filter: blur(80px); pointer-events: none; z-index: 0;
+      animation: blobDrift var(--bd,12s) ease-in-out infinite alternate;
+    }
+    @keyframes blobDrift {
+      from { transform: translate(0,0) scale(1); }
+      to   { transform: translate(var(--bx,30px), var(--by,-20px)) scale(1.1); }
+    }
+
+    /* =====================================================
+       SETUP OVERLAY
+    ===================================================== */
+    #setup-overlay {
+      position: fixed; inset: 0;
+      background: rgba(5,5,10,0.97);
+      z-index: 2000; display: flex;
+      align-items: center; justify-content: center;
+      padding: 1.5rem;
+    }
+    .setup-card {
+      background: var(--surface);
+      border: 1px solid var(--accent);
+      border-radius: 1.5rem;
+      padding: 2rem 2.5rem;
+      max-width: 580px; width: 100%;
+      box-shadow: var(--glow);
+    }
+    .setup-card h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem; letter-spacing: 3px;
+      color: var(--accent); margin-bottom: 1rem;
+    }
+    .setup-card p { color: var(--muted); line-height: 1.7; margin-bottom: 0.6rem; }
+    .setup-card strong { color: var(--text); }
+    .setup-card code {
+      display: block;
+      background: var(--surf2); border: 1px solid var(--border);
+      border-radius: 0.5rem; padding: 0.9rem 1rem;
+      font-size: 0.78rem; color: var(--gold);
+      margin: 0.75rem 0; white-space: pre; overflow-x: auto;
+    }
+    .setup-card code.inline {
+      display: inline; padding: 0.1em 0.4em;
+      white-space: normal; font-size: 0.85em;
+    }
+    .setup-step {
+      display: flex; gap: 0.75rem; align-items: flex-start;
+      margin-bottom: 0.6rem;
+    }
+    .step-num {
+      background: var(--accent); color: #fff;
+      border-radius: 50%; width: 22px; height: 22px; min-width: 22px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 800; margin-top: 2px;
+    }
+    .setup-dismiss {
+      margin-top: 1.25rem;
+      background: linear-gradient(135deg,var(--accent),#ff9a5c);
+      color: #fff; border: none;
+      padding: 0.75rem 2rem; border-radius: 999px;
+      font-weight: 800; font-size: 1rem; cursor: pointer;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .setup-dismiss:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,107,53,.4); }
+
+    /* =====================================================
+       HEADER & NAV
+    ===================================================== */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(11,11,18,0.88);
+      backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-inner {
+      max-width: 940px; margin: 0 auto;
+      display: flex; align-items: center;
+      gap: 0.75rem; padding: 0.6rem 1.25rem;
+      flex-wrap: wrap;
+    }
+    .camp-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem; letter-spacing: 3px;
+      color: var(--accent);
+      text-shadow: 0 0 18px rgba(255,107,53,.5);
+      white-space: nowrap;
+    }
+    .tabs-nav {
+      display: flex; gap: 0.2rem;
+      overflow-x: auto; scrollbar-width: none;
+      flex: 1;
+    }
+    .tabs-nav::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      background: none; border: none;
+      color: var(--muted); font-weight: 700;
+      font-size: 0.82rem; padding: 0.45rem 0.9rem;
+      border-radius: 0.5rem; cursor: pointer;
+      white-space: nowrap;
+      position: relative; transition: color .2s, background .2s;
+    }
+    .tab-btn::after {
+      content: ''; position: absolute;
+      bottom: -1px; left: 50%;
+      transform: translateX(-50%);
+      width: 0; height: 2px;
+      background: var(--accent);
+      transition: width .3s;
+    }
+    .tab-btn.active { color: var(--text); }
+    .tab-btn.active::after { width: 70%; }
+    .tab-btn:hover { color: var(--text); background: var(--surf2); }
+    .visitor-badge {
+      background: var(--surf2); border: 1px solid var(--border);
+      border-radius: 999px; padding: 0.3rem 0.9rem;
+      font-size: 0.78rem; color: var(--gold);
+      display: flex; align-items: center; gap: 0.3rem;
+      white-space: nowrap;
+    }
+
+    /* =====================================================
+       MAIN LAYOUT
+    ===================================================== */
+    main {
+      position: relative; z-index: 1;
+      max-width: 940px; margin: 0 auto;
+      padding: 1.5rem 1.25rem 3rem;
+    }
+    .tab-panel { display: none; animation: fadeUp .35s ease; }
+    .tab-panel.active { display: block; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* =====================================================
+       HERO
+    ===================================================== */
+    .hero {
+      text-align: center;
+      padding: 2.5rem 0 1.75rem;
+    }
+    .hero-eyebrow {
+      font-size: 0.75rem; letter-spacing: 5px;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3.5rem, 14vw, 7rem);
+      letter-spacing: 4px; line-height: 0.92;
+      text-shadow: 0 0 60px rgba(255,107,53,.25), 0 4px 24px rgba(0,0,0,.8);
+    }
+    .hero-title .ht-sub { color: var(--accent); }
+    .hero-tagline {
+      color: var(--muted); margin-top: 0.9rem;
+      font-size: 1rem;
+    }
+
+    /* =====================================================
+       CARD
+    ===================================================== */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 1.25rem;
+      padding: 1.6rem 1.75rem;
+      margin-bottom: 1.4rem;
+      position: relative; overflow: hidden;
+    }
+    .card::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--gold), transparent);
+    }
+    .card-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem; letter-spacing: 2px;
+      color: var(--gold); margin-bottom: 1.25rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+
+    /* =====================================================
+       CAMP IMAGE
+    ===================================================== */
+    .camp-img-wrap {
+      width: 100%; aspect-ratio: 16/9;
+      border-radius: 1rem; overflow: hidden;
+      background: var(--surf2);
+      border: 2px dashed var(--border);
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .camp-img-wrap img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: none;
+      border-radius: 1rem;
+    }
+    .img-ph { text-align: center; color: var(--muted); padding: 2rem; }
+    .img-ph .ph-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+    .img-ph code { background: var(--surf3); border-radius: 4px; padding: 0.1em 0.4em; font-size: 0.85em; }
+
+    /* =====================================================
+       LOCATION
+    ===================================================== */
+    .loc-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1rem; margin-bottom: 1rem;
+    }
+    @media (max-width:480px) { .loc-grid { grid-template-columns: 1fr; } }
+    .loc-box {
+      background: var(--surf2); border: 1px solid var(--border);
+      border-radius: 0.85rem; padding: 1rem;
+      text-align: center;
+    }
+    .loc-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; }
+    .loc-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem; color: var(--accent); margin-top: 0.2rem;
+    }
+    .maps-btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: linear-gradient(135deg, var(--accent), #ff9a5c);
+      color: #fff; padding: 0.7rem 1.6rem;
+      border-radius: 999px; font-weight: 800;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .maps-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255,107,53,.4); }
+
+    /* =====================================================
+       MEMBERS SLIDESHOW
+    ===================================================== */
+    .slideshow { position: relative; }
+    .slides-overflow { overflow: hidden; border-radius: 1rem; }
+    .slides-track {
+      display: flex;
+      transition: transform .5s cubic-bezier(.25,1,.5,1);
+    }
+    .slide { min-width: 100%; padding: 0.15rem; }
+    .member-card {
+      background: var(--surf2); border: 1px solid var(--border);
+      border-radius: 1rem; padding: 2rem 1.5rem;
+      display: flex; flex-direction: column;
+      align-items: center; text-align: center; gap: 0.9rem;
+    }
+    .member-avatar {
+      width: 110px; height: 110px; border-radius: 50%;
+      background: var(--surf3);
+      border: 3px solid var(--accent);
+      overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.8rem;
+      box-shadow: 0 0 24px rgba(255,107,53,.3);
+    }
+    .member-avatar img { width:100%; height:100%; object-fit:cover; }
+    .member-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.9rem; letter-spacing: 2px;
+    }
+    .member-role {
+      font-size: 0.78rem; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--accent);
+      font-weight: 700;
+    }
+    .member-bio { color: var(--muted); line-height: 1.65; max-width: 380px; font-size: 0.95rem; }
+    .member-fact {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 0.75rem; padding: 0.65rem 1rem;
+      font-size: 0.82rem; color: var(--gold); max-width: 380px;
+    }
+    .slideshow-controls {
+      display: flex; align-items: center;
+      justify-content: center; gap: 1rem; margin-top: 0.9rem;
+    }
+    .slide-arrow {
+      background: var(--surf2); border: 1px solid var(--border);
+      color: var(--text); width: 36px; height: 36px;
+      border-radius: 50%; cursor: pointer;
+      font-size: 1rem; display: flex;
+      align-items: center; justify-content: center;
+      transition: all .2s;
+    }
+    .slide-arrow:hover { background: var(--accent); border-color: var(--accent); }
+    .dots { display: flex; gap: 0.35rem; }
+    .dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--muted); cursor: pointer;
+      transition: all .3s;
+    }
+    .dot.active { background: var(--accent); transform: scale(1.4); }
+
+    /* =====================================================
+       SPOTIFY
+    ===================================================== */
+    .spotify-ph {
+      background: var(--surf2); border: 2px dashed var(--border);
+      border-radius: 1rem; padding: 2rem; text-align: center;
+      color: var(--muted);
+    }
+    .spotify-ph .ph-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    .spotify-ph code { background: var(--surf3); border-radius: 4px; padding: 0.1em 0.4em; }
+    .spotify-embed-wrap iframe { border-radius: 1rem; display: block; }
+
+    /* =====================================================
+       BEER TRACKER
+    ===================================================== */
+    .counters-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1rem; margin-bottom: 1.4rem;
+    }
+    @media (max-width:400px) { .counters-grid { grid-template-columns: 1fr; } }
+    .counter-box {
+      background: var(--surf2); border: 1px solid var(--border);
+      border-radius: 1rem; padding: 1.35rem; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .counter-box::after {
+      content: ''; position: absolute;
+      bottom: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+    .c-label {
+      font-size: 0.7rem; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 2px; margin-bottom: 0.3rem;
+    }
+    .c-value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3.2rem; line-height: 1;
+      color: var(--gold);
+      text-shadow: 0 0 24px rgba(255,209,102,.35);
+    }
+    .c-sub { font-size: 0.7rem; color: var(--muted); margin-top: 0.2rem; }
+
+    .beer-btn {
+      display: block; width: 100%;
+      background: linear-gradient(135deg, #ff6b35, #ff9a5c);
+      border: none; color: #fff;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.9rem; letter-spacing: 3px;
+      padding: 1.15rem 2rem; border-radius: 1rem;
+      cursor: pointer; position: relative; overflow: hidden;
+      transition: transform .15s, box-shadow .15s;
+      box-shadow: 0 4px 24px rgba(255,107,53,.4);
+    }
+    .beer-btn:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 32px rgba(255,107,53,.6);
+    }
+    .beer-btn:active:not(:disabled) { transform: scale(0.97); }
+    .beer-btn:disabled {
+      opacity: 0.55; cursor: not-allowed;
+      transform: none !important; box-shadow: none !important;
+    }
+    .beer-icon { display: inline-block; }
+    .beer-btn:not(:disabled) .beer-icon {
+      animation: bounce 1.6s ease-in-out infinite;
+    }
+    @keyframes bounce {
+      0%,100% { transform:translateY(0); }
+      50%      { transform:translateY(-6px); }
+    }
+    .cooldown-track {
+      height: 4px; background: var(--surf2);
+      border-radius: 999px; margin-top: 0.75rem; overflow: hidden;
+    }
+    .cooldown-fill {
+      height: 100%; background: var(--accent);
+      border-radius: 999px; width: 0%;
+      transition: width .1s linear;
+    }
+    .cooldown-msg {
+      text-align: center; font-size: 0.8rem;
+      color: var(--muted); margin-top: 0.4rem;
+    }
+
+    /* Floating beer emojis */
+    .float-beer {
+      position: fixed; pointer-events: none; z-index: 600;
+      font-size: 2rem;
+      animation: floatUp 1.3s ease-out forwards;
+    }
+    @keyframes floatUp {
+      from { opacity:1; transform:translateY(0) scale(1); }
+      to   { opacity:0; transform:translateY(-160px) scale(.4); }
+    }
+
+    /* =====================================================
+       STATS TABLE
+    ===================================================== */
+    .stats-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .stats-table th {
+      text-align: left; padding: 0.65rem 0.75rem;
+      color: var(--accent);
+      font-family: 'Bebas Neue', sans-serif;
+      letter-spacing: 1px; font-size: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .stats-table td {
+      padding: 0.65rem 0.75rem;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: var(--muted);
+    }
+    .stats-table td:first-child { color: var(--text); font-weight: 700; }
+    .empty-row td { text-align: center; padding: 1.5rem !important; }
+
+    /* =====================================================
+       CHARTS
+    ===================================================== */
+    .chart-wrap { position: relative; height: 260px; margin-bottom: 0.5rem; }
+
+    /* =====================================================
+       MINI-GAMES
+    ===================================================== */
+
+    /* --- COIN FLIP --- */
+    .coin-scene {
+      perspective: 700px;
+      height: 140px; display: flex;
+      align-items: center; justify-content: center;
+      margin: 0.75rem 0;
+    }
+    .coin {
+      width: 100px; height: 100px;
+      position: relative; transform-style: preserve-3d;
+    }
+    .coin.flipping { animation: coinFlip 1.6s ease-out forwards; }
+    @keyframes coinFlip {
+      0%   { transform: rotateX(0); }
+      100% { transform: rotateX(var(--total,1980deg)); }
+    }
+    .coin-face {
+      position: absolute; inset: 0;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem;
+      backface-visibility: hidden;
+      border: 3px solid var(--gold);
+      box-shadow: inset 0 0 20px rgba(0,0,0,.3), 0 0 18px rgba(255,209,102,.2);
+    }
+    .coin-heads {
+      background: radial-gradient(circle at 35% 35%, #ffe066, #b8860b);
+    }
+    .coin-tails {
+      background: radial-gradient(circle at 35% 35%, #d0d0d0, #606060);
+      transform: rotateX(180deg);
+    }
+    .coin-result {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem; letter-spacing: 2px;
+      text-align: center; min-height: 2.2rem; color: var(--gold);
+    }
+    .flip-history {
+      display: flex; gap: 0.3rem; flex-wrap: wrap;
+      justify-content: center; margin-top: 0.6rem;
+    }
+    .flip-chip {
+      font-size: 0.7rem; padding: 0.15rem 0.5rem;
+      border-radius: 999px; font-weight: 700;
+    }
+    .flip-chip.h { background: rgba(255,209,102,.15); color: var(--gold); }
+    .flip-chip.t { background: rgba(138,138,160,.15); color: var(--muted); }
+
+    /* --- TASK ROLLER --- */
+    .task-display {
+      background: var(--surf2); border: 1px solid var(--border);
+      border-radius: 1rem; padding: 1.5rem;
+      min-height: 90px; display: flex;
+      align-items: center; justify-content: center;
+      text-align: center; font-size: 1.05rem;
+      font-weight: 600; line-height: 1.55;
+      margin: 1rem 0; position: relative;
+      overflow: hidden;
+    }
+    .task-display.reveal { animation: taskReveal .4s ease; }
+    @keyframes taskReveal {
+      from { opacity:0; transform:scale(.94); }
+      to   { opacity:1; transform:scale(1); }
+    }
+    .task-badge {
+      position: absolute; top: 0.5rem; right: 0.75rem;
+      font-size: 0.65rem; color: var(--muted);
+    }
+    .task-history {
+      color: var(--muted); font-size: 0.8rem;
+      border-top: 1px solid var(--border);
+      padding-top: 0.75rem; margin-top: 0.5rem;
+      max-height: 80px; overflow-y: auto;
+    }
+
+    /* GAME BUTTON */
+    .game-btn {
+      display: block; width: 100%;
+      background: var(--surf2); border: 1px solid var(--border);
+      color: var(--text); font-weight: 800;
+      padding: 0.75rem 1.5rem; border-radius: 999px;
+      cursor: pointer; font-size: 0.95rem;
+      transition: all .2s; margin-top: 0.5rem;
+    }
+    .game-btn:hover {
+      background: var(--accent); border-color: var(--accent);
+      transform: translateY(-2px); box-shadow: 0 4px 16px rgba(255,107,53,.4);
+    }
+    .game-btn:active { transform: scale(.97); }
+
+    /* =====================================================
+       UTILITIES
+    ===================================================== */
+    .text-muted { color: var(--muted); font-size: 0.88rem; }
+    .text-center { text-align: center; }
+    .mt1 { margin-top: 1rem; }
+    hr.divider { border: none; border-top: 1px solid var(--border); margin: 1.2rem 0; }
+
+    /* =====================================================
+       RESPONSIVE
+    ===================================================== */
+    @media (max-width: 600px) {
+      .header-inner { padding: 0.5rem 1rem; gap: 0.5rem; }
+      .card { padding: 1.25rem 1.1rem; }
+      .hero-title { font-size: clamp(3rem, 16vw, 5rem); }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- =========================================================
+     STARS + GLOW BACKGROUND
+========================================================= -->
+<div id="stars"></div>
+<div class="glow-blob" style="width:400px;height:400px;background:rgba(255,107,53,.06);top:-100px;left:-100px;--bd:14s;--bx:40px;--by:30px;"></div>
+<div class="glow-blob" style="width:300px;height:300px;background:rgba(255,209,102,.05);bottom:-80px;right:-60px;--bd:18s;--bx:-30px;--by:-40px;"></div>
+
+<!-- =========================================================
+     FIREBASE SETUP OVERLAY
+     Wird ausgeblendet sobald Firebase konfiguriert ist oder
+     der User auf "Weiter ohne Firebase" klickt.
+========================================================= -->
+<div id="setup-overlay" style="display:none;">
+  <div class="setup-card">
+    <h2>🔧 Firebase einrichten</h2>
+    <p>Für <strong>globale Zähler</strong> (Besucher, Biere aller Leute) brauchst du ein kostenloses Firebase-Konto. Ohne Firebase funktioniert der Tracker <strong>nur lokal</strong> auf dem jeweiligen Gerät.</p>
+    <div class="setup-step"><div class="step-num">1</div><p>Gehe zu <strong>console.firebase.google.com</strong> → Neues Projekt erstellen</p></div>
+    <div class="setup-step"><div class="step-num">2</div><p>Im Projekt: <strong>Build → Realtime Database</strong> → „Testmodus starten" wählen</p></div>
+    <div class="setup-step"><div class="step-num">3</div><p><strong>Projekteinstellungen (⚙️)</strong> → „Deine Apps" → Web-App (<code class="inline">&lt;/&gt;</code>) hinzufügen</p></div>
+    <div class="setup-step"><div class="step-num">4</div><p>Kopiere das <code class="inline">firebaseConfig</code>-Objekt und füge es in der <strong>index.html</strong> ein (Abschnitt „KONFIGURATION")</p></div>
+    <div class="setup-step"><div class="step-num">5</div><p>Fertig! Pushe die Datei auf GitHub Pages. 🎉</p></div>
+    <button class="setup-dismiss" onclick="dismissSetup()">Erstmal ohne Firebase fortfahren →</button>
+  </div>
+</div>
+
+<!-- =========================================================
+     HEADER
+========================================================= -->
+<header>
+  <div class="header-inner">
+    <div class="camp-logo" id="header-logo">🏕️ CAMP</div>
+    <nav class="tabs-nav">
+      <button class="tab-btn active" onclick="switchTab('camp',this)">🏕️ Camp</button>
+      <button class="tab-btn" onclick="switchTab('beer',this)">🍺 Bier-Tracker</button>
+      <button class="tab-btn" onclick="switchTab('stats',this)">📊 Statistik</button>
+      <button class="tab-btn" onclick="switchTab('games',this)">🎮 Spiele</button>
+    </nav>
+    <div class="visitor-badge">
+      👥&nbsp;<span id="visitor-count">...</span>
+    </div>
+  </div>
+</header>
+
+<!-- =========================================================
+     MAIN CONTENT
+========================================================= -->
+<main>
+
+  <!-- ═══════════════════════════════════════════════════
+       TAB: CAMP
+  ═══════════════════════════════════════════════════ -->
+  <div class="tab-panel active" id="tab-camp">
+
+    <section class="hero">
+      <div class="hero-eyebrow" id="hero-year">Festival 2025</div>
+      <h1 class="hero-title" id="hero-title">CAMP<br><span class="ht-sub">[NAME]</span></h1>
+      <p class="hero-tagline">Das beste Camp auf dem gesamten Gelände. Natürlich.</p>
+    </section>
+
+    <!-- Bild -->
+    <div class="card">
+      <h2 class="card-title">📸 Unser Camp</h2>
+      <div class="camp-img-wrap" id="camp-img-wrap">
+        <!-- Pfad zum Bild in CAMP_IMAGE_URL anpassen (Abschnitt KONFIGURATION unten) -->
+        <img id="camp-img" src="" alt="Camp Foto"
+             onload="this.style.display='block'; document.getElementById('camp-img-ph').style.display='none';"
+             onerror="this.style.display='none';">
+        <div class="img-ph" id="camp-img-ph">
+          <div class="ph-icon">🏕️</div>
+          <p>Setze <code>CAMP_IMAGE_URL</code> auf den Pfad zu eurem Camp-Foto.<br>
+          Zum Beispiel: <code>"fotos/camp.jpg"</code></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Standort -->
+    <div class="card">
+      <h2 class="card-title">📍 Unser Standort</h2>
+      <div class="loc-grid">
+        <div class="loc-box">
+          <div class="loc-label">Breitengrad</div>
+          <div class="loc-val" id="loc-lat">–</div>
+        </div>
+        <div class="loc-box">
+          <div class="loc-label">Längengrad</div>
+          <div class="loc-val" id="loc-lng">–</div>
+        </div>
+      </div>
+      <div class="text-center">
+        <a class="maps-btn" id="maps-link" href="#" target="_blank">🗺️ In Google Maps öffnen</a>
+      </div>
+      <!-- Optional: Bild der Karte. URL in MAP_IMAGE_URL setzen, dann sichtbar machen -->
+      <div style="margin-top:1rem; display:none;" id="map-img-wrap">
+        <img id="map-img" src="" alt="Karte" style="width:100%;border-radius:.85rem;">
+      </div>
+    </div>
+
+    <!-- Mitglieder Slideshow -->
+    <div class="card">
+      <h2 class="card-title">👥 Die Camp-Crew</h2>
+      <div class="slideshow">
+        <div class="slides-overflow">
+          <div class="slides-track" id="slides-track"></div>
+        </div>
+        <div class="slideshow-controls">
+          <button class="slide-arrow" onclick="changeSlide(-1)">←</button>
+          <div class="dots" id="dots"></div>
+          <button class="slide-arrow" onclick="changeSlide(1)">→</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Spotify -->
+    <div class="card">
+      <h2 class="card-title">🎵 Camp-Playlist</h2>
+      <div id="spotify-ph" class="spotify-ph">
+        <div class="ph-icon">🎵</div>
+        <p>Setze <code>SPOTIFY_PLAYLIST_ID</code> auf die ID deiner Playlist.<br>
+        Playlist-URL: <code>open.spotify.com/playlist/<strong>ID_HIER</strong></code></p>
+      </div>
+      <div id="spotify-wrap" class="spotify-embed-wrap" style="display:none;">
+        <iframe id="spotify-iframe"
+          width="100%" height="352" frameborder="0" allowfullscreen=""
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy"></iframe>
+      </div>
+    </div>
+
+  </div><!-- /tab-camp -->
+
+  <!-- ═══════════════════════════════════════════════════
+       TAB: BIER-TRACKER
+  ═══════════════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-beer">
+
+    <section class="hero" style="padding-top:1.5rem;">
+      <div class="hero-eyebrow">Für die wichtigen Dinge</div>
+      <h1 class="hero-title" style="font-size:clamp(2.8rem,12vw,5.5rem);">
+        BIER<br><span class="ht-sub">TRACKER</span>
+      </h1>
+    </section>
+
+    <div class="card">
+      <h2 class="card-title">📊 Aktuelle Zähler</h2>
+      <div class="counters-grid">
+        <div class="counter-box">
+          <div class="c-label">🧍 Deine heutigen Biere</div>
+          <div class="c-value" id="my-today">0</div>
+          <div class="c-sub" id="my-today-sub">heute</div>
+        </div>
+        <div class="counter-box">
+          <div class="c-label">🌍 Alle (Festival gesamt)</div>
+          <div class="c-value" id="global-total">0</div>
+          <div class="c-sub">das gesamte Wochenende</div>
+        </div>
+      </div>
+
+      <button class="beer-btn" id="beer-btn" onclick="addBeer()">
+        <span class="beer-icon">🍺</span>&nbsp;+1 BIER!
+      </button>
+      <div class="cooldown-track"><div class="cooldown-fill" id="cd-fill"></div></div>
+      <p class="cooldown-msg" id="cd-msg">Bereit! 🍻</p>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">📅 Deine Festival-Bilanz</h2>
+      <table class="stats-table">
+        <thead><tr><th>Tag</th><th>Deine Biere</th></tr></thead>
+        <tbody id="my-stats-body">
+          <tr class="empty-row"><td colspan="2">Noch keine Daten 🫙</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div><!-- /tab-beer -->
+
+  <!-- ═══════════════════════════════════════════════════
+       TAB: STATISTIK
+  ═══════════════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-stats">
+
+    <section class="hero" style="padding-top:1.5rem;">
+      <h1 class="hero-title" style="font-size:clamp(2.5rem,10vw,5rem);">
+        BIER<br><span class="ht-sub">STATS</span>
+      </h1>
+    </section>
+
+    <div class="card">
+      <h2 class="card-title">📊 Biere pro Tag (global)</h2>
+      <div class="chart-wrap"><canvas id="chart-daily"></canvas></div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">⏰ Aktivste Stunden (heute)</h2>
+      <div class="chart-wrap" style="height:210px;"><canvas id="chart-hourly"></canvas></div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">📋 Tagesübersicht</h2>
+      <table class="stats-table">
+        <thead><tr><th>Tag</th><th>Globale Biere</th><th>Aktivste Stunde</th></tr></thead>
+        <tbody id="global-stats-body">
+          <tr class="empty-row"><td colspan="3">Noch keine Daten 🫙</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div><!-- /tab-stats -->
+
+  <!-- ═══════════════════════════════════════════════════
+       TAB: SPIELE
+  ═══════════════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-games">
+
+    <section class="hero" style="padding-top:1.5rem;">
+      <div class="hero-eyebrow">Wenn die Langeweile droht</div>
+      <h1 class="hero-title" style="font-size:clamp(2.8rem,12vw,5.5rem);">
+        MINI<br><span class="ht-sub">SPIELE</span>
+      </h1>
+    </section>
+
+    <!-- Münzwurf -->
+    <div class="card">
+      <h2 class="card-title">🪙 Münzwurf</h2>
+      <p class="text-muted">Wirf die Münze und entscheide dein Schicksal.</p>
+
+      <div class="coin-scene">
+        <div class="coin" id="coin">
+          <div class="coin-face coin-heads">⭐</div>
+          <div class="coin-face coin-tails">🌙</div>
+        </div>
+      </div>
+
+      <div class="coin-result" id="coin-result">Drücke den Knopf!</div>
+
+      <div class="flip-history" id="flip-history"></div>
+
+      <button class="game-btn" id="coin-btn" onclick="flipCoin()">🪙 Münze werfen</button>
+    </div>
+
+    <!-- Zufalls-Aufgabe -->
+    <div class="card">
+      <h2 class="card-title">🎲 Zufalls-Aufgabe</h2>
+      <p class="text-muted">Drücke den Knopf – erfülle die Aufgabe. Oder trink. Du weißt selbst was besser ist.</p>
+
+      <div class="task-display" id="task-display">
+        <span>Drücke den Knopf! 👇</span>
+      </div>
+
+      <button class="game-btn" onclick="rollTask()">🎲 Aufgabe auswürfeln</button>
+
+      <hr class="divider">
+      <p class="text-muted" style="margin-bottom:.4rem;">Letzte Aufgaben:</p>
+      <div class="task-history" id="task-history">–</div>
+    </div>
+
+  </div><!-- /tab-games -->
+
+</main>
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
+<script>
+/* ============================================================
+   ⚙️ KONFIGURATION – HIER ANPASSEN!
+   ============================================================ */
+
+// 1. Name des Camps (erscheint überall als Titel)
+const CAMP_NAME = "CAMP [NAME]";
+
+// 2. Festival-Jahr / Untertitel
+const FESTIVAL_LABEL = "Festival 2025";
+
+// 3. GPS-Koordinaten eures Camps
+const LAT = 51.1234;
+const LNG = 12.5678;
+
+// 4. URL zu einem Foto des Camps (relativ oder absolut)
+//    z.B. "fotos/camp.jpg" oder "https://i.imgur.com/XXXXX.jpg"
+const CAMP_IMAGE_URL = "";
+
+// 5. Optional: URL zu einem Standort-Bild / Geländekarte
+//    Leer lassen = nicht anzeigen
+const MAP_IMAGE_URL = "";
+
+// 6. Spotify Playlist-ID
+//    URL: https://open.spotify.com/playlist/XXXXXX  → ID ist das XXXXXX
+const SPOTIFY_PLAYLIST_ID = "";
+
+// 7. Festival-Tage (ISO-Format YYYY-MM-DD)
+const FESTIVAL_DAYS = [
+  "2025-06-19",
+  "2025-06-20",
+  "2025-06-21",
+];
+
+// 8. Camp-Mitglieder
+//    photo: relativer Pfad oder URL. Leer lassen → emoji wird angezeigt
+const MEMBERS = [
+  {
+    name: "Max Mustermann",
+    role: "Chief Beer Officer",
+    emoji: "🍺",
+    bio: "Seit 2019 dabei und hat noch nie ein Camp-Frühstück verpasst. Kennt jeden Weg, jeden Trick.",
+    fact: "Kennt alle Wege zum nächsten Klo auswendig 🗺️",
+    photo: "",
+  },
+  {
+    name: "Lisa Beispiel",
+    role: "Head of Vibes",
+    emoji: "🎵",
+    bio: "Programmiert die Playlist und tanzt dabei selbst schon im Voraus.",
+    fact: "Hat die Camp-Flagge eigenhändig genäht 🏴",
+    photo: "",
+  },
+  {
+    name: "Tom Test",
+    role: "Grillmeister",
+    emoji: "🔥",
+    bio: "Waltet über den Grill mit eiserner Hand – und Zange. Sein Steak ist Legende.",
+    fact: "Schläft sogar beim lautesten Beat durch 😴",
+    photo: "",
+  },
+  // ← Weitere Mitglieder hier ergänzen!
+];
+
+// 9. Aufgaben für den Task-Roller
+const TASKS = [
+  "Erzähle jemandem einen Witz auf Englisch 🇬🇧",
+  "Mache 10 Liegestütze vor allen anderen 💪",
+  "Finde jemanden, der heute Geburtstag hat 🎂",
+  "Singe die erste Strophe deines Lieblingsliedes 🎤",
+  "Überzeuge jemanden, dir ein Getränk zu kaufen 🤝",
+  "Mache ein Selfie mit 3 fremden Menschen 📸",
+  "Tanze 30 Sekunden alleine – ohne Musik 🕺",
+  "Begrüße die nächste Person auf Französisch 🇫🇷",
+  "Erzähle deinen peinlichsten Festival-Moment 😳",
+  "Mache jemandem ein ehrliches Kompliment 💛",
+  "Rufe laut 'Prost!' – wer antwortet, muss trinken 🍺",
+  "Finde jemanden mit exakt dem gleichen Schuhtyp 👟",
+  "Erkläre in einem Satz warum du das beste Campmitglied bist 👑",
+  "Trinke dein Getränk mit der falschen Hand 🙃",
+  "Tausche für 5 Minuten ein Accessoire mit jemandem 🎩",
+  "Mache ein Foto von deinen Schuhen und poste es in die Gruppe 📱",
+  "Zähle bis 10 in einer Sprache, die du kaum kennst 🔢",
+  "Finde den ältesten Gegenstand in deiner unmittelbaren Nähe 🕰️",
+  "Bitte jemanden um ein High-Five und warte einfach ab ✋",
+  "Erfinde spontan einen Festivaltanz und zeig ihn vor 🪩",
+];
+
+// 10. Cooldown in Sekunden zwischen zwei Bier-Klicks
+const COOLDOWN_SEC = 30;
+
+// 11. FIREBASE KONFIGURATION
+//     Hole dir diese Werte aus: console.firebase.google.com
+//     → Dein Projekt → Einstellungen ⚙️ → Deine Apps → Web-App
+//     Solange die Werte "YOUR_..." enthalten → Firebase inaktiv
+const firebaseConfig = {
+  apiKey:            "YOUR_API_KEY",
+  authDomain:        "YOUR_PROJECT.firebaseapp.com",
+  databaseURL:       "https://YOUR_PROJECT-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:         "YOUR_PROJECT",
+  storageBucket:     "YOUR_PROJECT.firebasestorage.app",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId:             "YOUR_APP_ID",
+};
+
+/* ============================================================
+   APP CODE – normalerweise nichts ändern
+   ============================================================ */
+
+let db = null;
+let fbReady = false;
+let dailyChart, hourlyChart;
+let cdInterval = null;
+let cdEnd = 0;
+
+// ── BOOT ──────────────────────────────────────────────────
+function init() {
+  setupStars();
+  applyConfig();
+  buildMembers();
+  initSpotify();
+  loadMyBeers();
+  restoreCooldown();
+
+  // Firebase
+  const configured = !firebaseConfig.apiKey.includes("YOUR_");
+  if (configured) {
+    try {
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.database();
+      fbReady = true;
+      fbInitVisitor();
+      fbListenGlobal();
+      fbListenBeerStats();
+    } catch(e) {
+      console.warn("Firebase init failed:", e);
+      showSetup();
+    }
+  } else {
+    const seen = localStorage.getItem("setup_seen");
+    if (!seen) setTimeout(showSetup, 1200);
+    document.getElementById("visitor-count").textContent = "🏕️";
+    // Render empty charts
+    renderCharts({});
+  }
+}
+
+function showSetup() { document.getElementById("setup-overlay").style.display = "flex"; }
+function dismissSetup() {
+  localStorage.setItem("setup_seen", "1");
+  document.getElementById("setup-overlay").style.display = "none";
+}
+
+// ── CONFIG APPLICATION ─────────────────────────────────────
+function applyConfig() {
+  // Name
+  document.getElementById("header-logo").textContent = "🏕️ " + CAMP_NAME;
+  document.title = CAMP_NAME;
+  document.getElementById("hero-year").textContent = FESTIVAL_LABEL;
+
+  // Hero title: split on first space to put second word orange
+  const parts = CAMP_NAME.split(" ");
+  const top = parts[0];
+  const rest = parts.slice(1).join(" ");
+  document.getElementById("hero-title").innerHTML =
+    top + (rest ? '<br><span class="ht-sub">' + rest + '</span>' : '');
+
+  // Coordinates
+  document.getElementById("loc-lat").textContent = LAT.toFixed(4) + "°N";
+  document.getElementById("loc-lng").textContent = LNG.toFixed(4) + "°E";
+  document.getElementById("maps-link").href =
+    "https://maps.google.com/?q=" + LAT + "," + LNG;
+
+  // Camp image
+  if (CAMP_IMAGE_URL) {
+    const img = document.getElementById("camp-img");
+    img.src = CAMP_IMAGE_URL;
+  }
+
+  // Map image
+  if (MAP_IMAGE_URL) {
+    document.getElementById("map-img").src = MAP_IMAGE_URL;
+    document.getElementById("map-img-wrap").style.display = "block";
+  }
+}
+
+// ── STARS ─────────────────────────────────────────────────
+function setupStars() {
+  const c = document.getElementById("stars");
+  for (let i = 0; i < 90; i++) {
+    const s = document.createElement("div");
+    s.className = "star";
+    const sz = Math.random() * 2.2 + 0.5;
+    Object.assign(s.style, {
+      left: Math.random() * 100 + "%",
+      top:  Math.random() * 100 + "%",
+      width: sz + "px", height: sz + "px",
+      "--op":    (Math.random() * 0.55 + 0.2).toFixed(2),
+      "--dur":   (Math.random() * 4 + 2).toFixed(1) + "s",
+      "--delay": (Math.random() * 6).toFixed(1) + "s",
+    });
+    c.appendChild(s);
+  }
+}
+
+// ── SPOTIFY ───────────────────────────────────────────────
+function initSpotify() {
+  if (SPOTIFY_PLAYLIST_ID && SPOTIFY_PLAYLIST_ID.length > 10) {
+    document.getElementById("spotify-ph").style.display = "none";
+    document.getElementById("spotify-wrap").style.display = "block";
+    document.getElementById("spotify-iframe").src =
+      `https://open.spotify.com/embed/playlist/${SPOTIFY_PLAYLIST_ID}?utm_source=generator&theme=0`;
+  }
+}
+
+// ── MEMBERS ───────────────────────────────────────────────
+let curSlide = 0;
+let autoSlide;
+
+function buildMembers() {
+  const track = document.getElementById("slides-track");
+  const dotsEl = document.getElementById("dots");
+  MEMBERS.forEach((m, i) => {
+    const slide = document.createElement("div");
+    slide.className = "slide";
+    slide.innerHTML = `
+      <div class="member-card">
+        <div class="member-avatar">
+          ${m.photo
+            ? `<img src="${m.photo}" alt="${m.name}" onerror="this.parentElement.innerHTML='${m.emoji}'">`
+            : m.emoji}
+        </div>
+        <div>
+          <div class="member-name">${m.name}</div>
+          <div class="member-role">${m.role}</div>
+        </div>
+        <p class="member-bio">${m.bio}</p>
+        <div class="member-fact">💡 ${m.fact}</div>
+      </div>`;
+    track.appendChild(slide);
+
+    const dot = document.createElement("div");
+    dot.className = "dot" + (i === 0 ? " active" : "");
+    dot.onclick = () => gotoSlide(i);
+    dotsEl.appendChild(dot);
+  });
+  autoSlide = setInterval(() => changeSlide(1), 5000);
+}
+
+function gotoSlide(i) {
+  curSlide = Math.max(0, Math.min(i, MEMBERS.length - 1));
+  document.getElementById("slides-track").style.transform =
+    `translateX(-${curSlide * 100}%)`;
+  document.querySelectorAll(".dot").forEach((d, j) =>
+    d.classList.toggle("active", j === curSlide));
+  clearInterval(autoSlide);
+  autoSlide = setInterval(() => changeSlide(1), 5000);
+}
+
+function changeSlide(dir) {
+  let n = curSlide + dir;
+  if (n < 0) n = MEMBERS.length - 1;
+  if (n >= MEMBERS.length) n = 0;
+  gotoSlide(n);
+}
+
+// ── USER ID ───────────────────────────────────────────────
+function getUID() {
+  let uid = localStorage.getItem("fuid");
+  if (!uid) {
+    uid = "u" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    localStorage.setItem("fuid", uid);
+  }
+  return uid;
+}
+
+// ── VISITOR COUNTER ───────────────────────────────────────
+function fbInitVisitor() {
+  const uid = getUID();
+  db.ref("visitor_ids/" + uid).once("value").then(snap => {
+    if (!snap.exists()) {
+      db.ref("visitor_ids/" + uid).set(true);
+      db.ref("visitors").transaction(v => (v || 0) + 1);
+    }
+  });
+  db.ref("visitors").on("value", snap => {
+    document.getElementById("visitor-count").textContent =
+      "Besucher: #" + ((snap.val() || 0).toLocaleString("de"));
+  });
+}
+
+// ── BEER: LOCAL DATA ──────────────────────────────────────
+function today() { return new Date().toISOString().split("T")[0]; }
+function hour()  { return new Date().getHours(); }
+
+function getMyData() {
+  return JSON.parse(localStorage.getItem("beer_data") || "{}");
+}
+function saveMyData(d) {
+  localStorage.setItem("beer_data", JSON.stringify(d));
+}
+
+function loadMyBeers() {
+  const data = getMyData();
+  const t = today();
+  const todayHours = data[t] || {};
+  const todayTotal = Object.values(todayHours).reduce((a,b)=>a+b,0);
+  document.getElementById("my-today").textContent = todayTotal;
+  document.getElementById("my-today-sub").textContent = "heute (" + fmtDay(t) + ")";
+  renderMyTable(data);
+
+  // Local global fallback (if no Firebase)
+  if (!fbReady) {
+    const g = parseInt(localStorage.getItem("local_global") || "0");
+    document.getElementById("global-total").textContent = g;
+  }
+}
+
+// ── BEER: FIREBASE LISTENERS ──────────────────────────────
+function fbListenGlobal() {
+  db.ref("beers/global").on("value", snap => {
+    document.getElementById("global-total").textContent =
+      (snap.val() || 0).toLocaleString("de");
+  });
+}
+
+function fbListenBeerStats() {
+  db.ref("beers/by_day").on("value", snap => {
+    const data = snap.val() || {};
+    renderGlobalTable(data);
+    renderCharts(data);
+  });
+}
+
+// ── BEER: ADD ─────────────────────────────────────────────
+function addBeer() {
+  if (Date.now() < cdEnd) return;
+
+  const t = today();
+  const h = hour();
+  const uid = getUID();
+
+  // Local
+  const myData = getMyData();
+  if (!myData[t]) myData[t] = {};
+  myData[t][h] = (myData[t][h] || 0) + 1;
+  saveMyData(myData);
+
+  const todayTotal = Object.values(myData[t]).reduce((a,b)=>a+b,0);
+  animCount("my-today", todayTotal);
+  renderMyTable(myData);
+
+  // Firebase or local fallback
+  if (fbReady) {
+    db.ref("beers/global").transaction(v => (v||0)+1);
+    db.ref(`beers/by_day/${t}/${h}`).transaction(v => (v||0)+1);
+    db.ref(`beers/users/${uid}/${t}/${h}`).transaction(v => (v||0)+1);
+  } else {
+    const g = parseInt(localStorage.getItem("local_global")||"0")+1;
+    localStorage.setItem("local_global", g);
+    animCount("global-total", g);
+  }
+
+  // Cooldown
+  cdEnd = Date.now() + COOLDOWN_SEC * 1000;
+  localStorage.setItem("cd_end", cdEnd);
+  startCooldownUI();
+
+  // Visual
+  spawnBeer();
+}
+
+function restoreCooldown() {
+  const saved = parseInt(localStorage.getItem("cd_end")||"0");
+  if (saved > Date.now()) { cdEnd = saved; startCooldownUI(); }
+}
+
+function startCooldownUI() {
+  const btn  = document.getElementById("beer-btn");
+  const fill = document.getElementById("cd-fill");
+  const msg  = document.getElementById("cd-msg");
+  btn.disabled = true;
+  clearInterval(cdInterval);
+  cdInterval = setInterval(() => {
+    const rem = Math.max(0, cdEnd - Date.now());
+    fill.style.width = ((1 - rem/(COOLDOWN_SEC*1000))*100) + "%";
+    if (rem <= 0) {
+      clearInterval(cdInterval);
+      btn.disabled = false;
+      fill.style.width = "0%";
+      msg.textContent = "Bereit! 🍻";
+    } else {
+      msg.textContent = `Cooldown: noch ${Math.ceil(rem/1000)}s warten…`;
+    }
+  }, 100);
+}
+
+function animCount(id, target) {
+  const el = document.getElementById(id);
+  const from = parseInt(el.textContent.replace(/\D/g,"")) || 0;
+  const steps = 18;
+  let s = 0;
+  const iv = setInterval(() => {
+    s++;
+    el.textContent = Math.round(from + (target - from) * s/steps);
+    if (s >= steps) { clearInterval(iv); el.textContent = target; }
+  }, 25);
+}
+
+function spawnBeer() {
+  const el = document.createElement("div");
+  el.className = "float-beer";
+  el.textContent = "🍺";
+  el.style.left  = (25 + Math.random()*50) + "%";
+  el.style.bottom = "15%";
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1400);
+}
+
+// ── TABLES ────────────────────────────────────────────────
+function fmtDay(dateStr) {
+  return new Date(dateStr + "T12:00:00").toLocaleDateString("de-DE",
+    { weekday:"short", day:"2-digit", month:"2-digit" });
+}
+
+function renderMyTable(data) {
+  const tbody = document.getElementById("my-stats-body");
+  const days = Object.keys(data).sort();
+  if (!days.length) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="2">Noch keine Daten 🫙</td></tr>';
+    return;
+  }
+  tbody.innerHTML = days.map(d => {
+    const cnt = Object.values(data[d]).reduce((a,b)=>a+b,0);
+    return `<tr><td>${fmtDay(d)}</td><td>🍺 ${cnt}</td></tr>`;
+  }).join("");
+}
+
+function renderGlobalTable(data) {
+  const tbody = document.getElementById("global-stats-body");
+  const days = Object.keys(data).sort();
+  if (!days.length) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="3">Noch keine Daten 🫙</td></tr>';
+    return;
+  }
+  tbody.innerHTML = days.map(d => {
+    const hrs = data[d];
+    const total = Object.values(hrs).reduce((a,b)=>a+b,0);
+    const peak  = Object.entries(hrs).sort((a,b)=>b[1]-a[1])[0];
+    return `<tr><td>${fmtDay(d)}</td><td>🍺 ${total}</td><td>${peak ? peak[0]+":00 Uhr" : "–"}</td></tr>`;
+  }).join("");
+}
+
+// ── CHARTS ────────────────────────────────────────────────
+const CHART_OPTS = {
+  responsive: true, maintainAspectRatio: false,
+  plugins: { legend: { display: false } },
+  scales: {
+    x: { ticks:{ color:"#7a7a96" }, grid:{ color:"rgba(255,255,255,0.04)" } },
+    y: { ticks:{ color:"#7a7a96", stepSize:1 }, grid:{ color:"rgba(255,255,255,0.04)" }, beginAtZero:true },
+  }
+};
+
+function renderCharts(data) {
+  renderDailyChart(data);
+  renderHourlyChart(data);
+}
+
+function renderDailyChart(data) {
+  const ctx = document.getElementById("chart-daily").getContext("2d");
+  if (dailyChart) dailyChart.destroy();
+  const days   = Object.keys(data).sort();
+  const totals = days.map(d => Object.values(data[d]).reduce((a,b)=>a+b,0));
+  dailyChart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: days.map(fmtDay),
+      datasets: [{
+        data: totals,
+        backgroundColor: "rgba(255,107,53,0.65)",
+        borderColor: "#ff6b35",
+        borderWidth: 2,
+        borderRadius: 7,
+      }]
+    },
+    options: CHART_OPTS,
+  });
+}
+
+function renderHourlyChart(data) {
+  const ctx = document.getElementById("chart-hourly").getContext("2d");
+  if (hourlyChart) hourlyChart.destroy();
+  const t      = today();
+  const dayD   = data[t] || {};
+  const hours  = Array.from({length:24},(_,i)=>i);
+  const counts = hours.map(h => dayD[h] || 0);
+  hourlyChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: hours.map(h => h+":00"),
+      datasets: [{
+        data: counts,
+        fill: true,
+        backgroundColor: "rgba(255,209,102,0.12)",
+        borderColor: "#ffd166",
+        tension: 0.4,
+        pointBackgroundColor: "#ffd166",
+        pointRadius: 3,
+      }]
+    },
+    options: {
+      ...CHART_OPTS,
+      scales: {
+        ...CHART_OPTS.scales,
+        x: { ...CHART_OPTS.scales.x, ticks: { color:"#7a7a96", maxTicksLimit:12 } }
+      }
+    }
+  });
+}
+
+// ── TABS ──────────────────────────────────────────────────
+function switchTab(name, btn) {
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById("tab-" + name).classList.add("active");
+  btn.classList.add("active");
+
+  if (name === "stats") {
+    // Redraw charts (canvas sizing issue fix)
+    if (!fbReady) {
+      const localD = getMyData(); // build hourly mock from local
+      const mock = {};
+      Object.entries(localD).forEach(([d, hrs]) => { mock[d] = hrs; });
+      renderCharts(mock);
+    }
+  }
+}
+
+// ── COIN FLIP ─────────────────────────────────────────────
+let coinBusy = false;
+const flipHist = [];
+
+function flipCoin() {
+  if (coinBusy) return;
+  coinBusy = true;
+  const coin    = document.getElementById("coin");
+  const result  = document.getElementById("coin-result");
+  const btn     = document.getElementById("coin-btn");
+
+  const isHeads = Math.random() > .5;
+  const rots    = (9 + Math.floor(Math.random()*5)) * 360 + (isHeads ? 0 : 180);
+  coin.style.setProperty("--total", rots + "deg");
+  coin.classList.add("flipping");
+  result.textContent = "…";
+  btn.disabled = true;
+
+  setTimeout(() => {
+    coin.classList.remove("flipping");
+    coin.style.transform = `rotateX(${isHeads ? 0 : 180}deg)`;
+    result.textContent = isHeads ? "⭐ KOPF!" : "🌙 ZAHL!";
+    btn.disabled = false;
+    coinBusy = false;
+
+    flipHist.unshift(isHeads ? "K" : "Z");
+    if (flipHist.length > 12) flipHist.pop();
+    const histEl = document.getElementById("flip-history");
+    histEl.innerHTML = flipHist.map(x =>
+      `<span class="flip-chip ${x==="K"?"h":"t"}">${x==="K"?"⭐ Kopf":"🌙 Zahl"}</span>`
+    ).join("");
+  }, 1700);
+}
+
+// ── RANDOM TASK ───────────────────────────────────────────
+let lastTask = -1;
+const taskHist = [];
+
+function rollTask() {
+  let idx;
+  do { idx = Math.floor(Math.random() * TASKS.length); } while (idx === lastTask);
+  lastTask = idx;
+
+  const display = document.getElementById("task-display");
+  display.classList.remove("reveal");
+  void display.offsetWidth;
+  display.classList.add("reveal");
+  display.innerHTML = `
+    ${TASKS[idx]}
+    <div class="task-badge">#${idx+1}/${TASKS.length}</div>`;
+
+  taskHist.unshift(TASKS[idx]);
+  if (taskHist.length > 5) taskHist.pop();
+  document.getElementById("task-history").innerHTML =
+    taskHist.slice(1).map(t => `<div style="margin-bottom:.25rem;">▸ ${t}</div>`).join("") || "–";
+}
+
+// ── START ─────────────────────────────────────────────────
+window.addEventListener("DOMContentLoaded", init);
+</script>
+
+</body>
+</html>
