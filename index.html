@@ -612,6 +612,231 @@
     @media (hover: hover) {
       .bnav-btn:hover { color: var(--text); }
     }
+
+    /* =====================================================
+       SLOT MACHINE
+    ===================================================== */
+    .slot-machine {
+      background: var(--surf2); border: 2px solid var(--border);
+      border-radius: 1.25rem; padding: 1.4rem 1rem;
+      text-align: center; margin: 1rem 0;
+    }
+    .slot-reels {
+      display: flex; justify-content: center; gap: 0.6rem;
+      margin-bottom: 1rem;
+    }
+    .slot-reel {
+      width: 72px; height: 80px;
+      background: var(--surface); border: 2px solid var(--border);
+      border-radius: 0.75rem; overflow: hidden;
+      position: relative;
+      box-shadow: inset 0 6px 14px rgba(0,0,0,.5);
+    }
+    .slot-reel::before, .slot-reel::after {
+      content: ''; position: absolute;
+      left: 0; right: 0; height: 22px; z-index: 2; pointer-events: none;
+    }
+    .slot-reel::before { top: 0; background: linear-gradient(to bottom, var(--surface), transparent); }
+    .slot-reel::after  { bottom: 0; background: linear-gradient(to top, var(--surface), transparent); }
+    .slot-strip {
+      display: flex; flex-direction: column;
+      align-items: center;
+      transition: transform 0s;
+    }
+    .slot-strip.spinning {
+      animation: slotSpin var(--dur, 0.6s) cubic-bezier(.2,.8,.4,1) forwards;
+    }
+    @keyframes slotSpin {
+      0%   { transform: translateY(0); }
+      100% { transform: translateY(var(--end, -200px)); }
+    }
+    .slot-sym {
+      font-size: 2.2rem; height: 80px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .slot-result-msg {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem; letter-spacing: 2px;
+      min-height: 2rem; color: var(--gold);
+      transition: all .3s;
+    }
+    .slot-result-msg.win  { color: #06d6a0; text-shadow: 0 0 18px rgba(6,214,160,.6); animation: pulse .4s ease 3; }
+    .slot-result-msg.lose { color: var(--muted); }
+    @keyframes pulse {
+      0%,100% { transform: scale(1); }
+      50%      { transform: scale(1.12); }
+    }
+    .slot-payline {
+      position: absolute; top: 50%; left: 0; right: 0;
+      height: 2px; background: rgba(255,107,53,.4);
+      transform: translateY(-50%); pointer-events: none; z-index: 3;
+    }
+
+    /* =====================================================
+       KINGS CUP
+    ===================================================== */
+    .kc-deck {
+      perspective: 800px; height: 160px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0.75rem 0;
+    }
+    .kc-card {
+      width: 100px; height: 140px;
+      position: relative; transform-style: preserve-3d;
+      transition: transform .7s cubic-bezier(.25,1,.5,1);
+    }
+    .kc-card.flipped { transform: rotateY(180deg); }
+    .kc-face {
+      position: absolute; inset: 0; border-radius: 0.85rem;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      backface-visibility: hidden;
+      border: 2px solid var(--border);
+    }
+    .kc-back {
+      background: linear-gradient(135deg, #1c1c28, #2a2a40);
+      font-size: 2.5rem;
+    }
+    .kc-front {
+      background: linear-gradient(135deg, var(--surface), var(--surf3));
+      transform: rotateY(180deg);
+      padding: 0.5rem;
+      border-color: var(--gold);
+    }
+    .kc-card-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem; color: var(--gold);
+      line-height: 1;
+    }
+    .kc-card-name {
+      font-size: 0.65rem; color: var(--muted);
+      letter-spacing: 1px; text-transform: uppercase;
+    }
+    .kc-rule {
+      background: var(--surf2); border: 1px solid var(--border);
+      border-radius: 0.75rem; padding: 0.85rem 1rem;
+      text-align: center; min-height: 3.5rem;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.95rem; font-weight: 600;
+      line-height: 1.5; margin: 0.5rem 0 0.75rem;
+      color: var(--text);
+    }
+    .kc-drawn-chips {
+      display: flex; flex-wrap: wrap; gap: 0.3rem;
+      justify-content: center; margin-top: 0.5rem;
+    }
+    .kc-chip {
+      font-size: 0.7rem; padding: 0.15rem 0.55rem;
+      border-radius: 999px; font-weight: 700;
+      background: var(--surf2); border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .kc-chip.king { background: rgba(255,209,102,.15); border-color: var(--gold); color: var(--gold); }
+
+    /* =====================================================
+       WER MUSS TRINKEN
+    ===================================================== */
+    .wmt-players {
+      display: flex; flex-wrap: wrap; gap: 0.5rem;
+      justify-content: center; margin: 0.75rem 0;
+    }
+    .wmt-player {
+      background: var(--surf2); border: 2px solid var(--border);
+      border-radius: 999px; padding: 0.4rem 1rem;
+      font-weight: 700; font-size: 0.9rem;
+      cursor: pointer; transition: all .2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .wmt-player.selected { border-color: var(--accent); color: var(--accent); }
+    .wmt-player.excluded { opacity: 0.3; text-decoration: line-through; cursor: default; }
+    .wmt-result-area {
+      background: var(--surf2); border: 2px solid var(--border);
+      border-radius: 1rem; padding: 1.5rem;
+      text-align: center; min-height: 80px;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 0.4rem;
+      margin: 0.75rem 0;
+    }
+    .wmt-result-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.4rem; color: var(--accent);
+      text-shadow: 0 0 24px rgba(255,107,53,.5);
+      animation: wmt-appear .4s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes wmt-appear {
+      from { transform: scale(.5) rotate(-8deg); opacity: 0; }
+      to   { transform: scale(1) rotate(0deg);   opacity: 1; }
+    }
+    .wmt-result-sub { font-size: 0.85rem; color: var(--muted); }
+    .wmt-input-row {
+      display: flex; gap: 0.5rem; margin-top: 0.75rem;
+    }
+    .wmt-input {
+      flex: 1; background: var(--surf2); border: 1px solid var(--border);
+      border-radius: 0.6rem; padding: 0.6rem 0.9rem;
+      color: var(--text); font-family: inherit; font-size: 0.9rem;
+      outline: none;
+    }
+    .wmt-input:focus { border-color: var(--accent); }
+    .wmt-add-btn {
+      background: var(--accent); border: none; color: #fff;
+      border-radius: 0.6rem; padding: 0.6rem 1rem;
+      font-weight: 800; cursor: pointer; font-size: 1rem;
+      transition: opacity .2s;
+    }
+    .wmt-add-btn:hover { opacity: .85; }
+
+    /* =====================================================
+       BUZZ
+    ===================================================== */
+    .buzz-display {
+      background: var(--surf2); border: 2px solid var(--border);
+      border-radius: 1rem; padding: 1.5rem;
+      text-align: center; margin: 0.75rem 0;
+    }
+    .buzz-number {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 5rem; line-height: 1;
+      color: var(--text);
+      transition: all .2s;
+    }
+    .buzz-number.is-buzz {
+      color: var(--accent);
+      text-shadow: 0 0 30px rgba(255,107,53,.7);
+      animation: buzzShake .35s ease;
+    }
+    @keyframes buzzShake {
+      0%,100% { transform: rotate(0); }
+      20%      { transform: rotate(-6deg) scale(1.1); }
+      40%      { transform: rotate(6deg) scale(1.15); }
+      60%      { transform: rotate(-4deg); }
+      80%      { transform: rotate(3deg); }
+    }
+    .buzz-word {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem; letter-spacing: 3px;
+      margin-top: -0.25rem;
+    }
+    .buzz-word.say-buzz { color: var(--accent); }
+    .buzz-word.say-num  { color: var(--muted); }
+    .buzz-controls { display: flex; gap: 0.75rem; margin-top: 0.5rem; }
+    .buzz-btn {
+      flex: 1; background: var(--surf2); border: 1px solid var(--border);
+      color: var(--text); font-weight: 800;
+      padding: 0.75rem; border-radius: 0.75rem;
+      cursor: pointer; font-size: 1.3rem;
+      transition: all .15s;
+    }
+    .buzz-btn:hover { background: var(--surf3); border-color: var(--accent); }
+    .buzz-btn:active { transform: scale(.95); }
+    .buzz-rules {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 0.75rem; padding: 0.85rem 1rem;
+      font-size: 0.82rem; color: var(--muted);
+      line-height: 1.7; margin-top: 0.5rem;
+    }
+    .buzz-rules strong { color: var(--gold); }
   </style>
 </head>
 
@@ -845,9 +1070,7 @@
       </div>
 
       <div class="coin-result" id="coin-result">Drücke den Knopf!</div>
-
       <div class="flip-history" id="flip-history"></div>
-
       <button class="game-btn" id="coin-btn" onclick="flipCoin()">🪙 Münze werfen</button>
     </div>
 
@@ -867,6 +1090,96 @@
       <div class="task-history" id="task-history">–</div>
     </div>
 
+    <!-- Slot Machine -->
+    <div class="card">
+      <h2 class="card-title">🎰 Slot Machine</h2>
+      <p class="text-muted">Drei gleiche Symbole = du bestimmst eine Regel. Zwei gleiche = jemand anderes trinkt. Kein Match = du trinkst!</p>
+
+      <div class="slot-machine">
+        <div class="slot-reels">
+          <div class="slot-reel">
+            <div class="slot-payline"></div>
+            <div class="slot-strip" id="reel-0"></div>
+          </div>
+          <div class="slot-reel">
+            <div class="slot-payline"></div>
+            <div class="slot-strip" id="reel-1"></div>
+          </div>
+          <div class="slot-reel">
+            <div class="slot-payline"></div>
+            <div class="slot-strip" id="reel-2"></div>
+          </div>
+        </div>
+        <div class="slot-result-msg" id="slot-msg">Viel Glück! 🤞</div>
+      </div>
+
+      <button class="game-btn" id="slot-btn" onclick="spinSlot()">🎰 Drehen!</button>
+    </div>
+
+    <!-- Kings Cup -->
+    <div class="card">
+      <h2 class="card-title">👑 Kings Cup</h2>
+      <p class="text-muted">Ziehe eine Karte – befolge die Regel. Das Deck wird geleert, bis ein vierter König gezogen wird. Prost!</p>
+
+      <div class="kc-deck">
+        <div class="kc-card" id="kc-card">
+          <div class="kc-face kc-back">🂠</div>
+          <div class="kc-face kc-front">
+            <div class="kc-card-val" id="kc-val">?</div>
+            <div class="kc-card-name" id="kc-name"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="kc-rule" id="kc-rule">Drücke auf „Karte ziehen"!</div>
+
+      <div class="kc-drawn-chips" id="kc-drawn"></div>
+
+      <button class="game-btn" id="kc-btn" onclick="drawKCCard()">🃏 Karte ziehen</button>
+      <button class="game-btn" style="margin-top:.4rem;opacity:.6;font-size:.8rem;" onclick="resetKC()">↺ Neues Spiel</button>
+    </div>
+
+    <!-- Wer muss trinken -->
+    <div class="card">
+      <h2 class="card-title">⚖️ Wer muss trinken?</h2>
+      <p class="text-muted">Füge Namen hinzu, tippe auf einen um ihn auszuschließen, dann – das Schicksal entscheidet.</p>
+
+      <div class="wmt-players" id="wmt-players"></div>
+
+      <div class="wmt-input-row">
+        <input class="wmt-input" id="wmt-input" placeholder="Name hinzufügen…" maxlength="20"
+               onkeydown="if(event.key==='Enter') addWMTPlayer()">
+        <button class="wmt-add-btn" onclick="addWMTPlayer()">+</button>
+      </div>
+
+      <div class="wmt-result-area" id="wmt-result">
+        <span style="color:var(--muted);">Tippe auf „Los!" wenn alle bereit sind 👆</span>
+      </div>
+
+      <button class="game-btn" onclick="pickWMT()">🍺 Los! Wer trinkt?</button>
+    </div>
+
+    <!-- Buzz -->
+    <div class="card">
+      <h2 class="card-title">🔢 Buzz!</h2>
+      <p class="text-muted">Zählt reihum hoch. Bei jeder Zahl die durch 7 teilbar ist ODER eine 7 enthält: <strong style="color:var(--accent);">BUZZ!</strong> statt der Zahl. Wer sich verzählt, trinkt!</p>
+
+      <div class="buzz-display">
+        <div class="buzz-number" id="buzz-num">1</div>
+        <div class="buzz-word say-num" id="buzz-word">sag: 1</div>
+      </div>
+
+      <div class="buzz-controls">
+        <button class="buzz-btn" onclick="buzzStep(-1)">◀ Zurück</button>
+        <button class="buzz-btn" onclick="buzzReset()" style="flex:0.6;font-size:.85rem;">↺</button>
+        <button class="buzz-btn" onclick="buzzStep(1)">Weiter ▶</button>
+      </div>
+
+      <div class="buzz-rules">
+        <strong>Buzz-Regeln:</strong> Zahl ist durch 7 teilbar (7, 14, 21…) <em>oder</em> enthält eine 7 (17, 27, 37, 70, 71…). Wer falsch liegt oder zu lange überlegt – trinken! 🍺
+      </div>
+    </div>
+
   </div><!-- /tab-games -->
 
 </main>
@@ -880,7 +1193,7 @@
    ============================================================ */
 
 // 1. Name des Camps (erscheint überall als Titel)
-const CAMP_NAME = "Out:drink";
+const CAMP_NAME = "Out:think Out:drink";
 
 // 2. Festival-Jahr / Untertitel
 const FESTIVAL_LABEL = "NovaRock 2026";
@@ -890,15 +1203,12 @@ const LAT = 47.900991;
 const LNG = 17.08796;
 
 // 4. URL zu einem Foto des Camps (relativ oder absolut)
-//    z.B. "fotos/camp.jpg" oder "https://i.imgur.com/XXXXX.jpg"
 const CAMP_IMAGE_URL = "fotos/camp.jpg";
 
 // 5. Optional: URL zu einem Standort-Bild / Geländekarte
-//    Leer lassen = nicht anzeigen
 const MAP_IMAGE_URL = "fotos/Standort.png";
 
 // 6. Spotify Playlist-ID
-//    URL: https://open.spotify.com/playlist/XXXXXX  → ID ist das XXXXXX
 const SPOTIFY_PLAYLIST_ID = "2OH5uA1XF39Ehe2Zzl1cet";
 
 // 7. Festival-Tage (ISO-Format YYYY-MM-DD)
@@ -911,7 +1221,6 @@ const FESTIVAL_DAYS = [
 ];
 
 // 8. Camp-Mitglieder
-//    photo: relativer Pfad oder URL. Leer lassen → emoji wird angezeigt
 const MEMBERS = [
   {
     name: "Andreas",
@@ -953,7 +1262,6 @@ const MEMBERS = [
     fact: "Schläft sogar beim lautesten Beat durch 😴",
     photo: "fotos/Michael.jpg",
   },
-  // ← Weitere Mitglieder hier ergänzen!
 ];
 
 // 9. Aufgaben für den Task-Roller
@@ -984,10 +1292,6 @@ const TASKS = [
 const COOLDOWN_SEC = 10;
 
 // 11. FIREBASE KONFIGURATION
-//     Hole dir diese Werte aus: console.firebase.google.com
-//     → Dein Projekt → Einstellungen ⚙️ → Deine Apps → Web-App
-//     Solange die Werte "YOUR_..." enthalten → Firebase inaktiv
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyCItIZEtDOpUngEgIxFnb0YkYLz9k6890c",
   authDomain: "nova-rock-26.firebaseapp.com",
@@ -1016,6 +1320,12 @@ function init() {
   initSpotify();
   loadMyBeers();
   restoreCooldown();
+  // New games
+  buildReels();
+  buildKCDeck();
+  wmtPlayers = MEMBERS.map(m => ({ name: m.name, active: true }));
+  renderWMTPlayers();
+  updateBuzzDisplay();
 
   // Firebase
   const configured = !firebaseConfig.apiKey.includes("YOUR_");
@@ -1484,6 +1794,247 @@ function rollTask() {
   document.getElementById("task-history").innerHTML =
     taskHist.slice(1).map(t => `<div style="margin-bottom:.25rem;">▸ ${t}</div>`).join("") || "–";
 }
+
+// ── SLOT MACHINE ──────────────────────────────────────────
+const SLOT_SYMS = ["🍺","🎸","🏕️","🔥","⭐","🤘","🎵","💀"];
+let slotBusy = false;
+
+function buildReels() {
+  for (let r = 0; r < 3; r++) {
+    const strip = document.getElementById("reel-" + r);
+    // Build a long strip: 20 symbols for smooth illusion
+    let html = "";
+    for (let i = 0; i < 20; i++) {
+      html += `<div class="slot-sym">${SLOT_SYMS[Math.floor(Math.random()*SLOT_SYMS.length)]}</div>`;
+    }
+    strip.innerHTML = html;
+  }
+}
+
+function spinSlot() {
+  if (slotBusy) return;
+  slotBusy = true;
+  const btn = document.getElementById("slot-btn");
+  const msg = document.getElementById("slot-msg");
+  btn.disabled = true;
+  msg.textContent = "…";
+  msg.className = "slot-result-msg";
+
+  const results = [];
+
+  for (let r = 0; r < 3; r++) {
+    const strip   = document.getElementById("reel-" + r);
+    const sym     = SLOT_SYMS[Math.floor(Math.random() * SLOT_SYMS.length)];
+    results.push(sym);
+
+    // Rebuild strip ending on our chosen symbol
+    let html = "";
+    for (let i = 0; i < 18; i++) {
+      html += `<div class="slot-sym">${SLOT_SYMS[Math.floor(Math.random()*SLOT_SYMS.length)]}</div>`;
+    }
+    html += `<div class="slot-sym">${sym}</div>`; // second-to-last = winner shown in middle
+    html += `<div class="slot-sym">${SLOT_SYMS[Math.floor(Math.random()*SLOT_SYMS.length)]}</div>`;
+    strip.innerHTML = html;
+
+    const totalH  = 20 * 80; // 20 symbols × 80px each
+    const endY    = -(totalH - 80 - 80); // stop so winner is in middle slot
+    const dur     = 0.7 + r * 0.35;
+
+    strip.style.transition = "none";
+    strip.style.transform  = "translateY(0)";
+    strip.style.setProperty("--dur",  dur + "s");
+    strip.style.setProperty("--end",  endY + "px");
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        strip.style.animation = `slotSpin ${dur}s cubic-bezier(.1,.9,.3,1) forwards`;
+      });
+    });
+  }
+
+  const maxDur = 0.7 + 2 * 0.35 + 150;
+  setTimeout(() => {
+    const [a, b, c] = results;
+    let text, cls;
+    if (a === b && b === c) {
+      text = `${a}${b}${c} JACKPOT! Du machst eine Regel! 👑`;
+      cls = "win";
+    } else if (a === b || b === c || a === c) {
+      text = `Zwei gleiche – jemand anderes trinkt! 🍺`;
+      cls = "win";
+    } else {
+      text = `Kein Match – du trinkst! 🍺`;
+      cls = "lose";
+    }
+    msg.textContent = text;
+    msg.className   = "slot-result-msg " + cls;
+    btn.disabled    = false;
+    slotBusy        = false;
+  }, (0.7 + 2 * 0.35) * 1000 + 200);
+}
+
+// ── KINGS CUP ─────────────────────────────────────────────
+const KC_CARDS = [
+  { val:"A",  name:"Ass",    rule:"🌊 Waterfall – alle trinken, jeder darf erst aufhören wenn die Person vor ihm aufgehört hat!" },
+  { val:"2",  name:"Zwei",   rule:"👉 Du! – Such dir jemanden aus, der trinken muss." },
+  { val:"3",  name:"Drei",   rule:"☝️ Ich! – Du trinkst selbst." },
+  { val:"4",  name:"Vier",   rule:"🏃 Auf den Boden! – Wer zuletzt auf den Boden zeigt, trinkt." },
+  { val:"5",  name:"Fünf",   rule:"🧔 Typen! – Alle Männer trinken." },
+  { val:"6",  name:"Sechs",  rule:"👩 Mädels! – Alle Frauen trinken." },
+  { val:"7",  name:"Sieben", rule:"🙌 Himmel! – Alle Hände hoch – wer zuletzt, trinkt." },
+  { val:"8",  name:"Acht",   rule:"🤝 Kumpel! – Such dir einen Trinkpartner. Immer wenn einer trinkt, trinkt der andere mit." },
+  { val:"9",  name:"Neun",   rule:"🎤 Reim! – Sag ein Wort. Reihum muss gereimt werden. Wer nicht kann, trinkt." },
+  { val:"10", name:"Zehn",   rule:"📋 Kategorie! – Nenne eine Kategorie (z.B. Biermarken). Reihum nennen – wer stockt, trinkt." },
+  { val:"J",  name:"Bube",   rule:"🙅 Noch nie! – Runde Never Have I Ever: Wer's doch gemacht hat, trinkt." },
+  { val:"Q",  name:"Dame",   rule:"❓ Fragenmeister! – Du bist Fragenmeister. Wer eine Frage mit einer Aussage beantwortet, trinkt." },
+  { val:"K",  name:"König",  rule:"👑 KÖNIG! – Fülle den Cup in der Mitte. Wer den 4. König zieht, muss ihn austrinken!" },
+];
+
+// Build full deck: 4 suits × 13 cards
+let kcDeck = [];
+let kcDrawn = [];
+let kcKings = 0;
+let kcFlipped = false;
+
+function buildKCDeck() {
+  kcDeck = [];
+  KC_CARDS.forEach(c => { for(let i=0;i<4;i++) kcDeck.push({...c}); });
+  // shuffle
+  for (let i = kcDeck.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [kcDeck[i], kcDeck[j]] = [kcDeck[j], kcDeck[i]];
+  }
+  kcDrawn  = [];
+  kcKings  = 0;
+  kcFlipped = false;
+}
+
+function resetKC() {
+  buildKCDeck();
+  const card = document.getElementById("kc-card");
+  card.classList.remove("flipped");
+  document.getElementById("kc-val").textContent  = "?";
+  document.getElementById("kc-name").textContent = "";
+  document.getElementById("kc-rule").textContent = "Drücke auf „Karte ziehen"!";
+  document.getElementById("kc-drawn").innerHTML  = "";
+  document.getElementById("kc-btn").disabled     = false;
+}
+
+function drawKCCard() {
+  if (!kcDeck.length) return;
+  const card    = document.getElementById("kc-card");
+  const btn     = document.getElementById("kc-btn");
+
+  // flip back first if already showing
+  if (kcFlipped) {
+    card.classList.remove("flipped");
+    kcFlipped = false;
+    setTimeout(reveal, 400);
+  } else {
+    reveal();
+  }
+
+  function reveal() {
+    const drawn = kcDeck.pop();
+    kcDrawn.push(drawn.val);
+
+    document.getElementById("kc-val").textContent  = drawn.val;
+    document.getElementById("kc-name").textContent = drawn.name;
+    document.getElementById("kc-rule").textContent = drawn.rule;
+
+    card.classList.add("flipped");
+    kcFlipped = true;
+
+    // Update drawn chips
+    const counts = {};
+    kcDrawn.forEach(v => counts[v] = (counts[v]||0)+1);
+    document.getElementById("kc-drawn").innerHTML = Object.entries(counts)
+      .map(([v,n]) => `<span class="kc-chip ${v==='K'?'king':''}">${v}${n>1?'×'+n:''}</span>`)
+      .join("");
+
+    if (drawn.val === "K") {
+      kcKings++;
+      if (kcKings >= 4) {
+        document.getElementById("kc-rule").textContent =
+          "💀 4. König! Du musst den Cup austrinken! Spiel beendet. ↺ Neu starten für eine neue Runde.";
+        btn.disabled = true;
+      }
+    }
+
+    if (!kcDeck.length && kcKings < 4) {
+      document.getElementById("kc-rule").textContent += " — Deck leer! Neues Spiel starten.";
+      btn.disabled = true;
+    }
+  }
+}
+
+// ── WER MUSS TRINKEN ──────────────────────────────────────
+// Pre-fill with camp members
+let wmtPlayers = MEMBERS.map(m => ({ name: m.name, active: true }));
+
+function renderWMTPlayers() {
+  const el = document.getElementById("wmt-players");
+  el.innerHTML = wmtPlayers.map((p, i) =>
+    `<button class="wmt-player ${p.active ? "" : "excluded"}"
+       onclick="toggleWMT(${i})">${p.name}</button>`
+  ).join("");
+}
+
+function toggleWMT(i) {
+  wmtPlayers[i].active = !wmtPlayers[i].active;
+  renderWMTPlayers();
+}
+
+function addWMTPlayer() {
+  const input = document.getElementById("wmt-input");
+  const name  = input.value.trim();
+  if (!name) return;
+  wmtPlayers.push({ name, active: true });
+  input.value = "";
+  renderWMTPlayers();
+}
+
+function pickWMT() {
+  const active = wmtPlayers.filter(p => p.active);
+  if (active.length < 2) {
+    document.getElementById("wmt-result").innerHTML =
+      `<span style="color:var(--muted)">Mindestens 2 aktive Spieler nötig!</span>`;
+    return;
+  }
+  const winner = active[Math.floor(Math.random() * active.length)];
+  document.getElementById("wmt-result").innerHTML =
+    `<div class="wmt-result-name">${winner.name}</div>
+     <div class="wmt-result-sub">muss trinken! 🍺</div>`;
+}
+
+// ── BUZZ ──────────────────────────────────────────────────
+let buzzN = 1;
+
+function isBuzz(n) {
+  return n % 7 === 0 || String(n).includes("7");
+}
+
+function updateBuzzDisplay() {
+  const numEl  = document.getElementById("buzz-num");
+  const wordEl = document.getElementById("buzz-word");
+  const buzz   = isBuzz(buzzN);
+  numEl.textContent  = buzzN;
+  numEl.className    = "buzz-number" + (buzz ? " is-buzz" : "");
+  if (buzz) {
+    wordEl.textContent = "BUZZ! 🔥";
+    wordEl.className   = "buzz-word say-buzz";
+  } else {
+    wordEl.textContent = "sag: " + buzzN;
+    wordEl.className   = "buzz-word say-num";
+  }
+}
+
+function buzzStep(dir) {
+  buzzN = Math.max(1, buzzN + dir);
+  updateBuzzDisplay();
+}
+
+function buzzReset() { buzzN = 1; updateBuzzDisplay(); }
 
 // ── START ─────────────────────────────────────────────────
 window.addEventListener("DOMContentLoaded", init);
