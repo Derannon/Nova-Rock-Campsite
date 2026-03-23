@@ -977,6 +977,223 @@
       font-size: 0.85rem;
     }
 
+
+    /* =====================================================
+       MEHR DRAWER (Bottom sheet)
+    ===================================================== */
+    .mehr-overlay {
+      position: fixed; inset: 0; z-index: 300;
+      background: rgba(0,0,0,0); pointer-events: none;
+      transition: background .3s;
+    }
+    .mehr-overlay.open {
+      background: rgba(0,0,0,.55); pointer-events: all;
+    }
+    .mehr-sheet {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      z-index: 301;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-radius: 1.25rem 1.25rem 0 0;
+      padding: 0.75rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom,0px));
+      transform: translateY(100%);
+      transition: transform .35s cubic-bezier(.25,1,.5,1);
+    }
+    .mehr-sheet.open { transform: translateY(0); }
+    .mehr-handle {
+      width: 40px; height: 4px; border-radius: 2px;
+      background: var(--surf3); margin: 0 auto 1.1rem;
+    }
+    .mehr-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 0.6rem;
+    }
+    .mehr-item {
+      background: var(--surf2); border: 1px solid var(--border);
+      border-radius: 0.85rem; padding: 0.85rem 0.4rem;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 0.3rem;
+      cursor: pointer; transition: all .2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .mehr-item:hover, .mehr-item.active-tab {
+      background: rgba(255,107,53,.12); border-color: var(--accent);
+    }
+    .mehr-item.active-tab .mehr-item-icon {
+      filter: drop-shadow(0 0 6px rgba(255,107,53,.6));
+    }
+    .mehr-item-icon { font-size: 1.6rem; line-height: 1; }
+    .mehr-item-label {
+      font-size: 0.62rem; font-weight: 700;
+      letter-spacing: 0.5px; text-transform: uppercase;
+      color: var(--muted); text-align: center;
+    }
+    .mehr-item.active-tab .mehr-item-label { color: var(--accent); }
+    /* dot on Mehr button when a sub-tab is active */
+    .bnav-mehr-dot {
+      position: absolute; top: 6px; right: calc(50% - 18px);
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent);
+      display: none;
+    }
+    .bnav-mehr-dot.visible { display: block; }
+
+    /* =====================================================
+       CAMP ZITAT
+    ===================================================== */
+    .quote-card {
+      background: var(--surf2);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--gold);
+      border-radius: 0 1rem 1rem 0;
+      padding: 1.25rem 1.4rem;
+      position: relative;
+    }
+    .quote-text {
+      font-size: 1.05rem; font-style: italic;
+      line-height: 1.65; color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+    .quote-text::before { content: "\201E"; color: var(--gold); font-size: 1.4em; line-height: 0; vertical-align: -.2em; margin-right: .1em; }
+    .quote-text::after  { content: "\201C"; color: var(--gold); font-size: 1.4em; line-height: 0; vertical-align: -.2em; margin-left: .1em; }
+    .quote-author {
+      font-size: 0.78rem; color: var(--accent);
+      font-weight: 800; letter-spacing: 1px;
+    }
+    .quote-meta {
+      font-size: 0.7rem; color: var(--muted); margin-top: 0.15rem;
+    }
+    .quote-nav {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-top: 0.9rem;
+    }
+    .quote-counter { font-size: 0.75rem; color: var(--muted); }
+    .quote-arrows { display: flex; gap: 0.4rem; }
+    .quote-arr {
+      background: var(--surf3); border: 1px solid var(--border);
+      color: var(--text); width: 30px; height: 30px;
+      border-radius: 50%; cursor: pointer; font-size: 0.85rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .2s;
+    }
+    .quote-arr:hover { background: var(--accent); border-color: var(--accent); }
+    .quote-empty { text-align: center; color: var(--muted); padding: 1.5rem; font-size: 0.9rem; }
+
+    /* Admin quote form */
+    .admin-quote-form {
+      background: var(--surf2); border: 1px solid var(--border);
+      border-radius: 1rem; padding: 1.15rem;
+      margin-top: 1rem; display: none;
+    }
+    .admin-quote-form.visible { display: block; animation: fadeUp .3s ease; }
+    .aq-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
+    .aq-input {
+      flex: 1; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 0.6rem; color: var(--text);
+      font-family: inherit; font-size: 0.9rem;
+      padding: 0.6rem 0.85rem; outline: none;
+    }
+    .aq-input:focus { border-color: var(--gold); }
+    .aq-textarea {
+      width: 100%; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 0.6rem; color: var(--text);
+      font-family: inherit; font-size: 0.9rem;
+      padding: 0.6rem 0.85rem; outline: none;
+      resize: none; min-height: 70px; margin-bottom: 0.5rem;
+    }
+    .aq-textarea:focus { border-color: var(--gold); }
+    .aq-actions { display: flex; gap: 0.5rem; }
+    .aq-btn {
+      padding: 0.55rem 1.1rem; border-radius: 0.6rem;
+      font-weight: 800; cursor: pointer; font-family: inherit;
+      font-size: 0.85rem; border: none; transition: all .2s;
+    }
+    .aq-btn.save {
+      background: linear-gradient(135deg, var(--gold), #ffb700);
+      color: #1a1000;
+    }
+    .aq-btn.save:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(255,209,102,.4); }
+    .aq-btn.cancel { background: var(--surf3); color: var(--muted); }
+    .aq-delete-btn {
+      position: absolute; top: 0.75rem; right: 0.9rem;
+      background: none; border: none; color: var(--muted);
+      font-size: 1rem; cursor: pointer; padding: 0.2rem;
+      display: none;
+    }
+    .aq-delete-btn.visible { display: block; }
+    .admin-bar {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 0.6rem;
+    }
+    .admin-badge {
+      font-size: 0.65rem; background: rgba(255,209,102,.15);
+      border: 1px solid rgba(255,209,102,.3); color: var(--gold);
+      border-radius: 999px; padding: 0.15rem 0.6rem;
+      font-weight: 700; letter-spacing: 1px;
+    }
+
+    /* =====================================================
+       ACHIEVEMENTS
+    ===================================================== */
+    .ach-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+    @media (max-width: 380px) { .ach-grid { grid-template-columns: 1fr; } }
+    .ach-item {
+      background: var(--surf2); border: 1px solid var(--border);
+      border-radius: 1rem; padding: 1rem;
+      display: flex; gap: 0.75rem; align-items: flex-start;
+      transition: all .3s; position: relative; overflow: hidden;
+    }
+    .ach-item.unlocked {
+      border-color: var(--gold);
+      background: rgba(255,209,102,.07);
+    }
+    .ach-item.unlocked::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,209,102,.08), transparent);
+    }
+    .ach-icon {
+      font-size: 2rem; line-height: 1; flex-shrink: 0;
+      filter: grayscale(1) opacity(.35);
+      transition: filter .4s;
+    }
+    .ach-item.unlocked .ach-icon { filter: none; }
+    .ach-body { flex: 1; min-width: 0; }
+    .ach-name {
+      font-weight: 800; font-size: 0.88rem;
+      color: var(--muted); margin-bottom: 0.2rem;
+    }
+    .ach-item.unlocked .ach-name { color: var(--gold); }
+    .ach-desc { font-size: 0.75rem; color: var(--muted); line-height: 1.4; }
+    .ach-unlocked-at {
+      font-size: 0.65rem; color: var(--accent);
+      margin-top: 0.3rem; font-weight: 700;
+    }
+    .ach-lock { font-size: 0.65rem; color: var(--muted); margin-top: 0.25rem; }
+    /* unlock burst animation */
+    @keyframes achBurst {
+      0%   { transform: scale(0.5); opacity: 0; }
+      60%  { transform: scale(1.15); opacity: 1; }
+      100% { transform: scale(1);   opacity: 1; }
+    }
+    .ach-item.just-unlocked { animation: achBurst .5s cubic-bezier(.34,1.56,.64,1); }
+    .ach-toast {
+      position: fixed; bottom: 5.5rem; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: linear-gradient(135deg, var(--gold), #ffb700);
+      color: #1a1000; font-weight: 800; font-size: 0.85rem;
+      padding: 0.65rem 1.4rem; border-radius: 999px;
+      white-space: nowrap; z-index: 500;
+      opacity: 0; pointer-events: none;
+      transition: opacity .3s, transform .3s;
+      box-shadow: 0 4px 20px rgba(255,209,102,.5);
+    }
+    .ach-toast.show {
+      opacity: 1; transform: translateX(-50%) translateY(0);
+    }
+
   </style>
 </head>
 
@@ -1102,6 +1319,50 @@
           allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
           loading="lazy"></iframe>
       </div>
+    </div>
+
+    <!-- Camp Zitat -->
+    <div class="card" id="quote-card-wrap">
+      <div class="admin-bar">
+        <h2 class="card-title" style="margin-bottom:0;">💬 Camp-Zitat</h2>
+        <span class="admin-badge" id="admin-badge" style="display:none;">👑 ADMIN</span>
+      </div>
+
+      <div id="quote-display">
+        <div class="quote-empty" id="quote-empty">Noch keine Zitate. Admins können welche hinzufügen!</div>
+        <div id="quote-content" style="display:none;">
+          <div class="quote-card">
+            <button class="aq-delete-btn" id="aq-delete-btn" onclick="deleteQuote()">🗑️</button>
+            <div class="quote-text" id="quote-text"></div>
+            <div class="quote-author" id="quote-author"></div>
+            <div class="quote-meta" id="quote-meta"></div>
+          </div>
+          <div class="quote-nav">
+            <span class="quote-counter" id="quote-counter"></span>
+            <div class="quote-arrows">
+              <button class="quote-arr" onclick="prevQuote()">←</button>
+              <button class="quote-arr" onclick="nextQuote()">→</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-quote-form" id="aq-form">
+        <div class="aq-row">
+          <input class="aq-input" id="aq-author" placeholder="Wer hat das gesagt?">
+          <input class="aq-input" id="aq-context" placeholder="Kontext (optional)" style="flex:1.5">
+        </div>
+        <textarea class="aq-textarea" id="aq-text" placeholder="Was wurde gesagt? 🎤" maxlength="200"></textarea>
+        <div class="aq-actions">
+          <button class="aq-btn save" onclick="saveQuote()">💾 Speichern</button>
+          <button class="aq-btn cancel" onclick="closeAdminForm()">Abbrechen</button>
+        </div>
+      </div>
+
+      <button class="game-btn" id="add-quote-btn" onclick="openAdminForm()"
+        style="margin-top:.85rem; display:none;">+ Zitat hinzufügen</button>
+      <button class="game-btn" id="admin-login-btn" onclick="adminLogin()"
+        style="margin-top:.85rem; opacity:.35; font-size:.75rem;">👑 Admin</button>
     </div>
 
   </div><!-- /tab-camp -->
@@ -1433,6 +1694,25 @@
 
   </div><!-- /tab-gb -->
 
+  <!-- ═══════════════════════════════════════════════════
+       TAB: ACHIEVEMENTS
+  ═══════════════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-ach">
+
+    <section class="hero" style="padding-top:1.5rem;">
+      <div class="hero-eyebrow">Wirst du alle freischalten?</div>
+      <h1 class="hero-title" style="font-size:clamp(2.4rem,10vw,5rem);">
+        ACHIEVE<br><span class="ht-sub">MENTS</span>
+      </h1>
+    </section>
+
+    <div class="card">
+      <p class="text-muted" style="margin-bottom:1.1rem;">Werden lokal auf deinem Gerät gespeichert. Manche prüfen sich automatisch, andere wirst du selbst herausfinden müssen. 😉</p>
+      <div class="ach-grid" id="ach-grid"></div>
+    </div>
+
+  </div><!-- /tab-ach -->
+
 </main>
 
 <!-- =========================================================
@@ -1547,6 +1827,14 @@ const TASKS = [
 // 10. Cooldown in Sekunden zwischen zwei Bier-Klicks
 const COOLDOWN_SEC = 10;
 
+// 12. Admin-PIN (als SHA-256 Hash gespeichert – sicherer als Klartext)
+//     So erzeugst du einen neuen Hash:
+//     1. Gehe zu: https://emn178.github.io/online-tools/sha256.html
+//     2. Gib deinen gewünschten PIN ein
+//     3. Kopiere den Hash hierher
+//     Aktueller PIN: "1234"  ← vor dem Festival durch eigenen ersetzen!
+const ADMIN_PIN_HASH = "5c183439664d7ac2790fa3a6ccdcedfb91bd7c4566840e962fc40be088207e80";
+
 // 11. FIREBASE KONFIGURATION
 //     Hole dir diese Werte aus: console.firebase.google.com
 //     → Dein Projekt → Einstellungen ⚙️ → Deine Apps → Web-App
@@ -1597,6 +1885,7 @@ function init() {
       fbListenGlobal();
       fbListenBeerStats();
       fbListenGuestbook();
+      fbListenQuotes();
     } catch(e) {
       console.warn("Firebase init failed:", e);
       showSetup();
@@ -1608,6 +1897,7 @@ function init() {
     // Render empty charts
     renderCharts({});
     loadGuestbookLocal();
+    loadQuotesLocal();
   }
 }
 
@@ -1815,6 +2105,7 @@ function addBeer() {
   const todayTotal = Object.values(myData[t]).reduce((a,b)=>a+b,0);
   animCount("my-today", todayTotal);
   renderMyTable(myData);
+  setTimeout(() => { checkAchievement('beer_5'); checkAchievement('beer_10'); checkAchievement('beer_20'); }, 200);
 
   // Firebase or local fallback
   if (fbReady) {
@@ -2120,6 +2411,8 @@ function spinSlot() {
     if (a === b && b === c) {
       text = `${a}${b}${c} JACKPOT! Du machst eine Regel! 👑`;
       cls = "win";
+      localStorage.setItem('slot_jackpot','1');
+      checkAchievement('slot_jackpot');
     } else if (a === b || b === c || a === c) {
       text = `Zwei gleiche – jemand anderes trinkt! 🍺`;
       cls = "win";
@@ -2329,6 +2622,7 @@ function askConch() {
 
     answer.textContent = CONCH_ANSWERS[idx];
     answer.classList.add('lit');
+    trackConch();
 
     setTimeout(() => {
       shell.classList.remove('glowing');
@@ -2422,6 +2716,7 @@ function renderBingo() {
 
   if (win) {
     status.innerHTML = '<div class="bingo-win-msg">🎉 BINGO! 🎉</div>';
+    checkAchievement('bingo_win');
   } else if (marked === 0) {
     status.textContent = 'Tippe auf ein Feld wenn du es erlebt hast ✅';
   } else {
@@ -2515,6 +2810,334 @@ function renderGuestbookEntries(entries) {
   }).join('');
 }
 
+
+// ── MEHR DRAWER ───────────────────────────────────────────
+const MEHR_TABS = ['stats','conch','bingo','gb','ach'];
+let mehrOpen = false;
+
+function toggleMehr(btn) {
+  if (mehrOpen) { closeMehr(); return; }
+  mehrOpen = true;
+  document.getElementById('mehr-overlay').classList.add('open');
+  document.getElementById('mehr-sheet').classList.add('open');
+  // highlight active sub-tab in drawer
+  MEHR_TABS.forEach(t => {
+    const el = document.getElementById('mehr-' + t);
+    if (el) el.classList.toggle('active-tab',
+      document.getElementById('tab-' + t).classList.contains('active'));
+  });
+}
+
+function closeMehr() {
+  mehrOpen = false;
+  document.getElementById('mehr-overlay').classList.remove('open');
+  document.getElementById('mehr-sheet').classList.remove('open');
+}
+
+function switchFromMehr(name) {
+  closeMehr();
+  // activate Mehr button visually (as proxy for sub-tab)
+  document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('bnav-mehr').classList.add('active');
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  // show dot so user knows a sub-tab is active
+  document.getElementById('mehr-dot').style.display = 'block';
+  if (name === 'stats' && !fbReady) renderCharts(getMyData());
+}
+
+// ── CAMP ZITAT ────────────────────────────────────────────
+let quotes = [];
+let quoteIdx = 0;
+let isAdmin = false;
+
+async function adminLogin() {
+  const pin = prompt('Admin-PIN eingeben:');
+  if (pin === null) return; // user cancelled
+
+  // Hash the entered PIN with SHA-256 and compare – plain text never stored
+  const encoder = new TextEncoder();
+  const data    = encoder.encode(pin);
+  const hashBuf = await crypto.subtle.digest('SHA-256', data);
+  const hashHex = Array.from(new Uint8Array(hashBuf))
+    .map(b => b.toString(16).padStart(2, '0')).join('');
+
+  if (hashHex === ADMIN_PIN_HASH) {
+    isAdmin = true;
+    document.getElementById('admin-badge').style.display = 'inline';
+    document.getElementById('add-quote-btn').style.display = 'block';
+    document.getElementById('admin-login-btn').style.display = 'none';
+    document.getElementById('aq-delete-btn').classList.add('visible');
+    checkAchievement('admin');
+  } else {
+    alert('Falsche PIN! 🔒');
+  }
+}
+
+function openAdminForm() {
+  document.getElementById('aq-form').classList.add('visible');
+  document.getElementById('aq-text').focus();
+}
+function closeAdminForm() {
+  document.getElementById('aq-form').classList.remove('visible');
+  document.getElementById('aq-text').value = '';
+  document.getElementById('aq-author').value = '';
+  document.getElementById('aq-context').value = '';
+}
+
+function saveQuote() {
+  const text    = document.getElementById('aq-text').value.trim();
+  const author  = document.getElementById('aq-author').value.trim() || 'Anonym';
+  const context = document.getElementById('aq-context').value.trim();
+  if (!text) { alert('Bitte einen Text eingeben!'); return; }
+
+  const entry = { text, author, context, ts: Date.now() };
+
+  if (fbReady) {
+    db.ref('quotes').push(entry).then(() => closeAdminForm());
+  } else {
+    quotes.unshift(entry);
+    localStorage.setItem('quotes_local', JSON.stringify(quotes));
+    closeAdminForm();
+    renderQuotes();
+  }
+}
+
+function deleteQuote() {
+  if (!isAdmin) return;
+  if (!confirm('Dieses Zitat löschen?')) return;
+  const q = quotes[quoteIdx];
+  if (!q) return;
+  if (fbReady && q._key) {
+    db.ref('quotes/' + q._key).remove();
+  } else {
+    quotes.splice(quoteIdx, 1);
+    localStorage.setItem('quotes_local', JSON.stringify(quotes));
+    quoteIdx = Math.max(0, quoteIdx - 1);
+    renderQuotes();
+  }
+}
+
+function prevQuote() {
+  if (!quotes.length) return;
+  quoteIdx = (quoteIdx - 1 + quotes.length) % quotes.length;
+  renderQuotes();
+}
+function nextQuote() {
+  if (!quotes.length) return;
+  quoteIdx = (quoteIdx + 1) % quotes.length;
+  renderQuotes();
+}
+
+function renderQuotes() {
+  const empty   = document.getElementById('quote-empty');
+  const content = document.getElementById('quote-content');
+  const counter = document.getElementById('quote-counter');
+
+  if (!quotes.length) {
+    empty.style.display = 'block';
+    content.style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  content.style.display = 'block';
+
+  const q = quotes[quoteIdx];
+  document.getElementById('quote-text').textContent   = q.text;
+  document.getElementById('quote-author').textContent = '— ' + q.author;
+  document.getElementById('quote-meta').textContent   = q.context
+    ? q.context + ' · ' + new Date(q.ts).toLocaleDateString('de-DE')
+    : new Date(q.ts).toLocaleDateString('de-DE');
+  counter.textContent = (quoteIdx + 1) + ' / ' + quotes.length;
+}
+
+function fbListenQuotes() {
+  db.ref('quotes').orderByChild('ts').on('value', snap => {
+    quotes = [];
+    snap.forEach(child => {
+      quotes.unshift({ ...child.val(), _key: child.key });
+    });
+    renderQuotes();
+  });
+}
+
+function loadQuotesLocal() {
+  quotes = JSON.parse(localStorage.getItem('quotes_local') || '[]');
+  renderQuotes();
+}
+
+// ── ACHIEVEMENTS ──────────────────────────────────────────
+const ACHIEVEMENTS = [
+  {
+    id: 'first_visit',
+    icon: '🚀', name: 'Erster Besuch',
+    desc: 'Du hast die Camp-Seite zum ersten Mal geöffnet.',
+    check: () => true,  // auto-unlock on first visit
+  },
+  {
+    id: 'early_bird',
+    icon: '🌅', name: 'Frühaufsteher',
+    desc: 'Die Seite vor 9 Uhr morgens besucht.',
+    check: () => new Date().getHours() < 9,
+  },
+  {
+    id: 'night_owl',
+    icon: '🦉', name: 'Nachteule',
+    desc: 'Die Seite nach 3 Uhr nachts besucht.',
+    check: () => new Date().getHours() >= 3 && new Date().getHours() < 5,
+  },
+  {
+    id: 'beer_5',
+    icon: '🍺', name: 'Warmup',
+    desc: 'Heute mind. 5 Biere getrackt.',
+    check: () => {
+      const d = getMyData()[today()];
+      return d ? Object.values(d).reduce((a,b)=>a+b,0) >= 5 : false;
+    },
+  },
+  {
+    id: 'beer_10',
+    icon: '🍻', name: 'Auf Betriebstemperatur',
+    desc: 'Heute mind. 10 Biere getrackt.',
+    check: () => {
+      const d = getMyData()[today()];
+      return d ? Object.values(d).reduce((a,b)=>a+b,0) >= 10 : false;
+    },
+  },
+  {
+    id: 'beer_20',
+    icon: '💀', name: 'Legende',
+    desc: 'Heute mind. 20 Biere getrackt. Wir machen uns Sorgen.',
+    check: () => {
+      const d = getMyData()[today()];
+      return d ? Object.values(d).reduce((a,b)=>a+b,0) >= 20 : false;
+    },
+  },
+  {
+    id: 'all_days',
+    icon: '📅', name: 'Dauerbesucher',
+    desc: 'An allen Festival-Tagen die Seite besucht.',
+    check: () => {
+      const visited = JSON.parse(localStorage.getItem('visited_days') || '[]');
+      return FESTIVAL_DAYS.every(d => visited.includes(d));
+    },
+  },
+  {
+    id: 'bingo_win',
+    icon: '🎯', name: 'BINGO!',
+    desc: 'Eine vollständige Reihe im Festival-Bingo abgehakt.',
+    check: () => {
+      const m = JSON.parse(localStorage.getItem('bingo_marked') || '[]');
+      if (!m.length) return false;
+      const lines = [[0,1,2,3,4],[5,6,7,8,9],[10,11,12,13,14],[15,16,17,18,19],[20,21,22,23,24],
+        [0,5,10,15,20],[1,6,11,16,21],[2,7,12,17,22],[3,8,13,18,23],[4,9,14,19,24],
+        [0,6,12,18,24],[4,8,12,16,20]];
+      return lines.some(l => l.every(i => m[i]));
+    },
+  },
+  {
+    id: 'conch_5',
+    icon: '🐚', name: 'Muschelflüsterer',
+    desc: 'Die Magische Miesmuschel 5-mal befragt.',
+    check: () => (parseInt(localStorage.getItem('conch_count')||'0')) >= 5,
+  },
+  {
+    id: 'guestbook',
+    icon: '📖', name: 'Verewigte Seele',
+    desc: 'Einen Eintrag im Gästebuch hinterlassen.',
+    check: () => !!localStorage.getItem('gb_submitted'),
+  },
+  {
+    id: 'admin',
+    icon: '👑', name: 'Royalty',
+    desc: 'Als Admin eingeloggt. Respekt.',
+    check: () => isAdmin,
+  },
+  {
+    id: 'slot_jackpot',
+    icon: '🎰', name: 'Jackpot!',
+    desc: 'Drei gleiche Symbole in der Slot Machine gedreht.',
+    check: () => !!localStorage.getItem('slot_jackpot'),
+  },
+];
+
+function loadAchievements() {
+  return JSON.parse(localStorage.getItem('achievements') || '{}');
+}
+function saveAchievements(ach) {
+  localStorage.setItem('achievements', JSON.stringify(ach));
+}
+
+function checkAchievement(id) {
+  const ach = loadAchievements();
+  if (ach[id]) return; // already unlocked
+  const def = ACHIEVEMENTS.find(a => a.id === id);
+  if (!def) return;
+  if (def.check()) {
+    ach[id] = Date.now();
+    saveAchievements(ach);
+    showAchToast(def);
+    renderAchievements();
+  }
+}
+
+function checkAllAchievements() {
+  ACHIEVEMENTS.forEach(a => checkAchievement(a.id));
+}
+
+function showAchToast(def) {
+  let toast = document.getElementById('ach-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'ach-toast';
+    toast.className = 'ach-toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = def.icon + ' Achievement: ' + def.name + '!';
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3200);
+}
+
+function renderAchievements() {
+  const grid = document.getElementById('ach-grid');
+  if (!grid) return;
+  const unlocked = loadAchievements();
+  grid.innerHTML = ACHIEVEMENTS.map(a => {
+    const isUnlocked = !!unlocked[a.id];
+    const unlockedAt = isUnlocked
+      ? new Date(unlocked[a.id]).toLocaleDateString('de-DE', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})
+      : null;
+    return `<div class="ach-item${isUnlocked ? ' unlocked' : ''}">
+      <div class="ach-icon">${a.icon}</div>
+      <div class="ach-body">
+        <div class="ach-name">${a.name}</div>
+        <div class="ach-desc">${a.desc}</div>
+        ${isUnlocked
+          ? `<div class="ach-unlocked-at">✅ ${unlockedAt}</div>`
+          : `<div class="ach-lock">🔒 Noch gesperrt</div>`}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Track visited days
+function trackVisitedDay() {
+  const visited = JSON.parse(localStorage.getItem('visited_days') || '[]');
+  const t = today();
+  if (!visited.includes(t)) {
+    visited.push(t);
+    localStorage.setItem('visited_days', JSON.stringify(visited));
+  }
+}
+
+// Track conch count
+function trackConch() {
+  const n = parseInt(localStorage.getItem('conch_count') || '0') + 1;
+  localStorage.setItem('conch_count', n);
+  checkAchievement('conch_5');
+}
+
 // ── START ─────────────────────────────────────────────────
 window.addEventListener("DOMContentLoaded", init);
 </script>
@@ -2522,6 +3145,34 @@ window.addEventListener("DOMContentLoaded", init);
 <!-- =========================================================
      BOTTOM NAVIGATION BAR
 ========================================================= -->
+<!-- Mehr drawer overlay -->
+<div class="mehr-overlay" id="mehr-overlay" onclick="closeMehr()"></div>
+<div class="mehr-sheet" id="mehr-sheet">
+  <div class="mehr-handle"></div>
+  <div class="mehr-grid">
+    <div class="mehr-item" id="mehr-stats" onclick="switchFromMehr('stats')">
+      <span class="mehr-item-icon">📊</span>
+      <span class="mehr-item-label">Stats</span>
+    </div>
+    <div class="mehr-item" id="mehr-conch" onclick="switchFromMehr('conch')">
+      <span class="mehr-item-icon">🐚</span>
+      <span class="mehr-item-label">Muschel</span>
+    </div>
+    <div class="mehr-item" id="mehr-bingo" onclick="switchFromMehr('bingo')">
+      <span class="mehr-item-icon">🎯</span>
+      <span class="mehr-item-label">Bingo</span>
+    </div>
+    <div class="mehr-item" id="mehr-gb" onclick="switchFromMehr('gb')">
+      <span class="mehr-item-icon">📖</span>
+      <span class="mehr-item-label">Gästebuch</span>
+    </div>
+    <div class="mehr-item" id="mehr-ach" onclick="switchFromMehr('ach')">
+      <span class="mehr-item-icon">🏆</span>
+      <span class="mehr-item-label">Badges</span>
+    </div>
+  </div>
+</div>
+
 <nav class="bottom-nav">
   <button class="bnav-btn active" onclick="switchTab('camp', this)">
     <span class="bnav-icon">🏕️</span>
@@ -2531,25 +3182,14 @@ window.addEventListener("DOMContentLoaded", init);
     <span class="bnav-icon">🍺</span>
     <span class="bnav-label">Bier</span>
   </button>
-  <button class="bnav-btn" onclick="switchTab('stats', this)">
-    <span class="bnav-icon">📊</span>
-    <span class="bnav-label">Stats</span>
-  </button>
   <button class="bnav-btn" onclick="switchTab('games', this)">
     <span class="bnav-icon">🎮</span>
     <span class="bnav-label">Spiele</span>
   </button>
-  <button class="bnav-btn" onclick="switchTab('conch', this)">
-    <span class="bnav-icon">🐚</span>
-    <span class="bnav-label">Muschel</span>
-  </button>
-  <button class="bnav-btn" onclick="switchTab('bingo', this)">
-    <span class="bnav-icon">🎯</span>
-    <span class="bnav-label">Bingo</span>
-  </button>
-  <button class="bnav-btn" onclick="switchTab('gb', this)">
-    <span class="bnav-icon">📖</span>
-    <span class="bnav-label">Buch</span>
+  <button class="bnav-btn" id="bnav-mehr" onclick="toggleMehr(this)">
+    <span class="mehr-dot" id="mehr-dot" style="position:absolute;top:6px;right:calc(50% - 16px);width:6px;height:6px;border-radius:50%;background:var(--accent);display:none;"></span>
+    <span class="bnav-icon">⋯</span>
+    <span class="bnav-label">Mehr</span>
   </button>
 </nav>
 
