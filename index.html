@@ -787,56 +787,196 @@
     }
     .wmt-add-btn:hover { opacity: .85; }
 
+
     /* =====================================================
-       BUZZ
+       MAGIC CONCH SHELL
     ===================================================== */
-    .buzz-display {
-      background: var(--surf2); border: 2px solid var(--border);
-      border-radius: 1rem; padding: 1.5rem;
-      text-align: center; margin: 0.75rem 0;
+    .conch-scene {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 1rem;
+      padding: 1rem 0;
     }
-    .buzz-number {
+    .conch-shell {
+      width: 140px; height: 140px;
+      cursor: pointer; position: relative;
+      filter: drop-shadow(0 0 0px rgba(255,209,102,0));
+      transition: filter .3s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .conch-shell:hover { filter: drop-shadow(0 0 18px rgba(255,209,102,.5)); }
+    .conch-shell.shaking { animation: conchShake .6s ease; }
+    .conch-shell.glowing { filter: drop-shadow(0 0 28px rgba(255,209,102,.9)); }
+    @keyframes conchShake {
+      0%,100% { transform: rotate(0) scale(1); }
+      15%     { transform: rotate(-8deg) scale(1.05); }
+      30%     { transform: rotate(8deg) scale(1.08); }
+      45%     { transform: rotate(-6deg) scale(1.06); }
+      60%     { transform: rotate(6deg) scale(1.04); }
+      75%     { transform: rotate(-3deg) scale(1.02); }
+    }
+    .conch-svg { width: 100%; height: 100%; }
+    .conch-answer {
+      background: var(--surf2); border: 2px solid var(--gold);
+      border-radius: 1.25rem; padding: 1.25rem 1.5rem;
+      text-align: center; min-height: 80px;
+      display: flex; align-items: center; justify-content: center;
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 5rem; line-height: 1;
-      color: var(--text);
+      font-size: 1.6rem; letter-spacing: 2px;
+      color: var(--gold); line-height: 1.3;
+      box-shadow: 0 0 0px rgba(255,209,102,0);
+      transition: box-shadow .4s;
+      max-width: 380px; width: 100%;
+    }
+    .conch-answer.lit {
+      box-shadow: 0 0 30px rgba(255,209,102,.25);
+      animation: conchReveal .5s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes conchReveal {
+      from { transform: scale(.88); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+    .conch-tap-hint {
+      font-size: 0.75rem; color: var(--muted);
+      letter-spacing: 2px; text-transform: uppercase;
+    }
+
+    /* =====================================================
+       FESTIVAL BINGO
+    ===================================================== */
+    .bingo-controls {
+      display: flex; gap: 0.6rem; flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    .bingo-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.35rem;
+      margin-bottom: 1rem;
+    }
+    .bingo-cell {
+      aspect-ratio: 1/1;
+      background: var(--surf2); border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; cursor: pointer;
+      font-size: clamp(0.45rem, 1.8vw, 0.68rem);
+      font-weight: 700; line-height: 1.25;
+      padding: 0.2rem; color: var(--text);
       transition: all .2s;
+      position: relative; overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
     }
-    .buzz-number.is-buzz {
-      color: var(--accent);
-      text-shadow: 0 0 30px rgba(255,107,53,.7);
-      animation: buzzShake .35s ease;
+    .bingo-cell.free {
+      background: linear-gradient(135deg, var(--accent), #ff9a5c);
+      color: #fff; font-size: clamp(0.9rem, 3vw, 1.3rem);
+      cursor: default; border-color: var(--accent);
     }
-    @keyframes buzzShake {
-      0%,100% { transform: rotate(0); }
-      20%      { transform: rotate(-6deg) scale(1.1); }
-      40%      { transform: rotate(6deg) scale(1.15); }
-      60%      { transform: rotate(-4deg); }
-      80%      { transform: rotate(3deg); }
+    .bingo-cell.marked {
+      background: rgba(6,214,160,.18);
+      border-color: var(--teal);
+      color: var(--teal);
     }
-    .buzz-word {
+    .bingo-cell.marked::after {
+      content: '✓';
+      position: absolute; top: 2px; right: 4px;
+      font-size: 0.65rem; color: var(--teal); font-weight: 900;
+    }
+    .bingo-cell.bingo-line {
+      background: rgba(255,209,102,.2);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+    .bingo-cell:not(.free):not(.marked):hover {
+      background: var(--surf3); border-color: var(--muted);
+      transform: scale(1.04);
+    }
+    .bingo-header {
+      display: grid; grid-template-columns: repeat(5,1fr);
+      gap: 0.35rem; margin-bottom: 0.2rem;
+    }
+    .bingo-letter {
+      text-align: center; font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.2rem; color: var(--accent); letter-spacing: 2px;
+    }
+    .bingo-status {
+      background: var(--surf2); border: 1px solid var(--border);
+      border-radius: 0.75rem; padding: 0.7rem 1rem;
+      text-align: center; font-size: 0.85rem; color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+    .bingo-status .bingo-win-msg {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 2rem; letter-spacing: 3px;
-      margin-top: -0.25rem;
+      font-size: 1.6rem; color: var(--gold);
+      text-shadow: 0 0 18px rgba(255,209,102,.5);
+      animation: pulse .4s ease 3;
     }
-    .buzz-word.say-buzz { color: var(--accent); }
-    .buzz-word.say-num  { color: var(--muted); }
-    .buzz-controls { display: flex; gap: 0.75rem; margin-top: 0.5rem; }
-    .buzz-btn {
-      flex: 1; background: var(--surf2); border: 1px solid var(--border);
-      color: var(--text); font-weight: 800;
-      padding: 0.75rem; border-radius: 0.75rem;
-      cursor: pointer; font-size: 1.3rem;
-      transition: all .15s;
+
+    /* =====================================================
+       GÄSTEBUCH
+    ===================================================== */
+    .gb-form {
+      background: var(--surf2); border: 1px solid var(--border);
+      border-radius: 1rem; padding: 1.25rem;
+      margin-bottom: 1.25rem;
     }
-    .buzz-btn:hover { background: var(--surf3); border-color: var(--accent); }
-    .buzz-btn:active { transform: scale(.95); }
-    .buzz-rules {
+    .gb-form textarea {
+      width: 100%; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 0.65rem;
+      color: var(--text); font-family: inherit; font-size: 0.95rem;
+      padding: 0.75rem; resize: none; outline: none;
+      line-height: 1.55; min-height: 80px;
+    }
+    .gb-form textarea:focus { border-color: var(--accent); }
+    .gb-form-row {
+      display: flex; gap: 0.6rem; margin-top: 0.6rem; flex-wrap: wrap;
+    }
+    .gb-name-input {
+      flex: 1; min-width: 120px;
       background: var(--surface); border: 1px solid var(--border);
-      border-radius: 0.75rem; padding: 0.85rem 1rem;
-      font-size: 0.82rem; color: var(--muted);
-      line-height: 1.7; margin-top: 0.5rem;
+      border-radius: 0.65rem; color: var(--text);
+      font-family: inherit; font-size: 0.9rem;
+      padding: 0.6rem 0.9rem; outline: none;
     }
-    .buzz-rules strong { color: var(--gold); }
+    .gb-name-input:focus { border-color: var(--accent); }
+    .gb-submit {
+      background: linear-gradient(135deg, var(--accent), #ff9a5c);
+      border: none; color: #fff; font-weight: 800;
+      padding: 0.6rem 1.4rem; border-radius: 0.65rem;
+      cursor: pointer; font-size: 0.9rem; font-family: inherit;
+      transition: transform .2s, box-shadow .2s; white-space: nowrap;
+    }
+    .gb-submit:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(255,107,53,.4); }
+    .gb-submit:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .gb-entries { display: flex; flex-direction: column; gap: 0.85rem; }
+    .gb-entry {
+      background: var(--surf2); border: 1px solid var(--border);
+      border-radius: 1rem; padding: 1rem 1.2rem;
+      animation: fadeUp .35s ease;
+      position: relative;
+    }
+    .gb-entry-header {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 0.4rem;
+      gap: 0.5rem; flex-wrap: wrap;
+    }
+    .gb-entry-name {
+      font-weight: 800; color: var(--accent); font-size: 0.9rem;
+    }
+    .gb-entry-time {
+      font-size: 0.7rem; color: var(--muted);
+    }
+    .gb-entry-text {
+      color: var(--text); font-size: 0.92rem; line-height: 1.6;
+    }
+    .gb-empty {
+      text-align: center; color: var(--muted);
+      padding: 2rem; font-size: 0.9rem;
+    }
+    .gb-loading {
+      text-align: center; color: var(--muted); padding: 1rem;
+      font-size: 0.85rem;
+    }
+
   </style>
 </head>
 
@@ -1159,28 +1299,139 @@
       <button class="game-btn" onclick="pickWMT()">🍺 Los! Wer trinkt?</button>
     </div>
 
-    <!-- Buzz -->
+
+  </div><!-- /tab-games -->
+
+  <!-- ═══════════════════════════════════════════════════
+       TAB: MAGISCHE MIESMUSCHEL
+  ═══════════════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-conch">
+
+    <section class="hero" style="padding-top:1.5rem;">
+      <div class="hero-eyebrow">Die Wahrheit liegt in ihr</div>
+      <h1 class="hero-title" style="font-size:clamp(2.2rem,10vw,4.5rem);">
+        MAGISCHE<br><span class="ht-sub">MIESMUSCHEL</span>
+      </h1>
+    </section>
+
     <div class="card">
-      <h2 class="card-title">🔢 Buzz!</h2>
-      <p class="text-muted">Zählt reihum hoch. Bei jeder Zahl die durch 7 teilbar ist ODER eine 7 enthält: <strong style="color:var(--accent);">BUZZ!</strong> statt der Zahl. Wer sich verzählt, trinkt!</p>
+      <p class="text-muted text-center" style="margin-bottom:1rem;">
+        Stelle der Muschel eine Frage. Sie wird antworten.<br>
+        <em style="font-size:.8rem;">Die Muschel sagt keine „Nein".</em>
+      </p>
 
-      <div class="buzz-display">
-        <div class="buzz-number" id="buzz-num">1</div>
-        <div class="buzz-word say-num" id="buzz-word">sag: 1</div>
-      </div>
+      <div class="conch-scene">
+        <div class="conch-shell" id="conch-shell" onclick="askConch()">
+          <!-- Hand-drawn conch SVG -->
+          <svg class="conch-svg" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="cg1" cx="40%" cy="35%" r="65%">
+                <stop offset="0%" stop-color="#ffe8b0"/>
+                <stop offset="45%" stop-color="#f4a03a"/>
+                <stop offset="100%" stop-color="#b05c10"/>
+              </radialGradient>
+              <radialGradient id="cg2" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#ffd580"/>
+                <stop offset="100%" stop-color="#c87020"/>
+              </radialGradient>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="3" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+            <!-- Main shell body -->
+            <ellipse cx="72" cy="78" rx="46" ry="50" fill="url(#cg1)" stroke="#c87020" stroke-width="1.5"/>
+            <!-- Shell spiral ridges -->
+            <path d="M72 38 Q95 48 98 72 Q100 92 82 104" stroke="#c87020" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="M72 44 Q90 53 91 73 Q92 88 76 98" stroke="#d4821a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <path d="M68 40 Q48 52 46 74 Q45 94 62 106" stroke="#c87020" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <!-- Spire tip -->
+            <path d="M72 20 Q78 28 82 36 Q76 33 72 38 Q68 33 62 36 Q66 28 72 20Z" fill="url(#cg2)" stroke="#b05c10" stroke-width="1"/>
+            <path d="M72 26 Q76 30 78 34 Q75 32 72 34 Q69 32 66 34 Q68 30 72 26Z" fill="#ffeab5"/>
+            <!-- Opening -->
+            <ellipse cx="72" cy="112" rx="22" ry="12" fill="#7a2e00" stroke="#b05c10" stroke-width="1.5"/>
+            <ellipse cx="72" cy="110" rx="18" ry="9" fill="#5a1a00"/>
+            <!-- Highlight -->
+            <ellipse cx="58" cy="58" rx="10" ry="14" fill="rgba(255,255,220,0.25)" transform="rotate(-20 58 58)"/>
+            <!-- Star sparkles -->
+            <g id="conch-sparkles" opacity="0">
+              <text x="18" y="30" font-size="14" fill="#ffd166">✨</text>
+              <text x="100" y="25" font-size="12" fill="#ffd166">⭐</text>
+              <text x="110" y="90" font-size="10" fill="#ffd166">✨</text>
+            </g>
+          </svg>
+        </div>
 
-      <div class="buzz-controls">
-        <button class="buzz-btn" onclick="buzzStep(-1)">◀ Zurück</button>
-        <button class="buzz-btn" onclick="buzzReset()" style="flex:0.6;font-size:.85rem;">↺</button>
-        <button class="buzz-btn" onclick="buzzStep(1)">Weiter ▶</button>
-      </div>
-
-      <div class="buzz-rules">
-        <strong>Buzz-Regeln:</strong> Zahl ist durch 7 teilbar (7, 14, 21…) <em>oder</em> enthält eine 7 (17, 27, 37, 70, 71…). Wer falsch liegt oder zu lange überlegt – trinken! 🍺
+        <div class="conch-answer" id="conch-answer">
+          Tippe auf die Muschel…
+        </div>
+        <div class="conch-tap-hint">Tippe zum Befragen</div>
       </div>
     </div>
 
-  </div><!-- /tab-games -->
+  </div><!-- /tab-conch -->
+
+  <!-- ═══════════════════════════════════════════════════
+       TAB: FESTIVAL BINGO
+  ═══════════════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-bingo">
+
+    <section class="hero" style="padding-top:1.5rem;">
+      <div class="hero-eyebrow">Wer zuerst ruft gewinnt</div>
+      <h1 class="hero-title" style="font-size:clamp(2.8rem,12vw,5.5rem);">
+        FESTIVAL<br><span class="ht-sub">BINGO</span>
+      </h1>
+    </section>
+
+    <div class="card">
+      <div class="bingo-status" id="bingo-status">Tippe auf ein Feld wenn du es erlebt hast ✅</div>
+
+      <div class="bingo-header">
+        <div class="bingo-letter">B</div>
+        <div class="bingo-letter">I</div>
+        <div class="bingo-letter">N</div>
+        <div class="bingo-letter">G</div>
+        <div class="bingo-letter">O</div>
+      </div>
+
+      <div class="bingo-grid" id="bingo-grid"></div>
+
+      <div class="bingo-controls">
+        <button class="game-btn" onclick="newBingoCard()" style="font-size:.85rem;">🔀 Neue Karte</button>
+      </div>
+      <p class="text-muted" style="font-size:.75rem;">Jede Karte ist zufällig zusammengewürfelt. Das mittlere Feld ist immer Freiraum 🎉</p>
+    </div>
+
+  </div><!-- /tab-bingo -->
+
+  <!-- ═══════════════════════════════════════════════════
+       TAB: GÄSTEBUCH
+  ═══════════════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-gb">
+
+    <section class="hero" style="padding-top:1.5rem;">
+      <div class="hero-eyebrow">Hinterlasse dein Zeichen</div>
+      <h1 class="hero-title" style="font-size:clamp(2.8rem,12vw,5.5rem);">
+        GÄSTE<br><span class="ht-sub">BUCH</span>
+      </h1>
+    </section>
+
+    <div class="card">
+      <div class="gb-form">
+        <textarea id="gb-text" placeholder="Was willst du dem Camp sagen? 🏕️" maxlength="300"></textarea>
+        <div class="gb-form-row">
+          <input class="gb-name-input" id="gb-name" placeholder="Dein Name (optional)" maxlength="30">
+          <button class="gb-submit" id="gb-submit" onclick="submitGuestbook()">✉️ Eintragen</button>
+        </div>
+      </div>
+
+      <div id="gb-entries-wrap">
+        <div class="gb-loading" id="gb-loading">⏳ Lade Einträge…</div>
+        <div class="gb-entries" id="gb-entries"></div>
+      </div>
+    </div>
+
+  </div><!-- /tab-gb -->
 
 </main>
 
@@ -1334,7 +1585,6 @@ function init() {
   buildKCDeck();
   wmtPlayers = MEMBERS.map(m => ({ name: m.name, active: true }));
   renderWMTPlayers();
-  updateBuzzDisplay();
 
   // Firebase
   const configured = !firebaseConfig.apiKey.includes("YOUR_");
@@ -1346,6 +1596,7 @@ function init() {
       fbInitVisitor();
       fbListenGlobal();
       fbListenBeerStats();
+      fbListenGuestbook();
     } catch(e) {
       console.warn("Firebase init failed:", e);
       showSetup();
@@ -1356,6 +1607,7 @@ function init() {
     document.getElementById("visitor-count").textContent = "🏕️";
     // Render empty charts
     renderCharts({});
+    loadGuestbookLocal();
   }
 }
 
@@ -2016,34 +2268,252 @@ function pickWMT() {
      <div class="wmt-result-sub">muss trinken! 🍺</div>`;
 }
 
-// ── BUZZ ──────────────────────────────────────────────────
-let buzzN = 1;
 
-function isBuzz(n) {
-  return n % 7 === 0 || String(n).includes("7");
+// ── MAGIC CONCH SHELL ─────────────────────────────────────
+const CONCH_ANSWERS = [
+  "VIELLEICHT EINES TAGES",
+  "NEIN",
+  "OH JA",
+  "ICH GLAUBE SCHON",
+  "TRINKE MEHR",
+  "DIE MUSCHEL SAGT NICHTS",
+  "WAS MEINST DU?",
+  "FOLGE DEM WEG DES LÄRMS",
+  "GEH EINFACH HIN",
+  "DANN HOL NOCH EINS",
+  "PROST",
+  "WER FRAGT, DER TRINKT",
+  "DIE ANTWORT LAUTET: JA",
+  "NIEMALS",
+  "VORSICHT IST GEBOTEN",
+  "NUR MIT MEHR BIER",
+  "FRAG NOCHMAL MORGEN FRÜH",
+  "ES IST AN DER ZEIT",
+  "DU WEISST BEREITS DIE ANTWORT",
+  "DIE MUSCHEL LACHT",
+  "VERTRAU DEM PROCESS",
+  "AUF KEINEN FALL",
+  "DIE ZEICHEN DEUTEN AUF JA",
+  "TRINK ERSTMAL EIN BIER",
+  "SO IST ES VORGESEHEN",
+  "WAGE ES UND SCHAU WAS PASSIERT",
+  "DIE MUSCHEL IST SKEPTISCH",
+  "FÜNF WEITERE BIERE UND DU WIRST WISSEN",
+];
+
+let conchBusy = false;
+let lastConchIdx = -1;
+
+function askConch() {
+  if (conchBusy) return;
+  conchBusy = true;
+
+  const shell  = document.getElementById('conch-shell');
+  const answer = document.getElementById('conch-answer');
+  const sparks = shell.querySelector('#conch-sparkles');
+
+  shell.classList.add('shaking');
+  answer.classList.remove('lit');
+  answer.textContent = '…';
+
+  setTimeout(() => {
+    shell.classList.remove('shaking');
+    shell.classList.add('glowing');
+    sparks.style.opacity = '1';
+    sparks.style.transition = 'opacity .3s';
+
+    let idx;
+    do { idx = Math.floor(Math.random() * CONCH_ANSWERS.length); }
+    while (idx === lastConchIdx);
+    lastConchIdx = idx;
+
+    answer.textContent = CONCH_ANSWERS[idx];
+    answer.classList.add('lit');
+
+    setTimeout(() => {
+      shell.classList.remove('glowing');
+      sparks.style.opacity = '0';
+      conchBusy = false;
+    }, 1800);
+  }, 700);
 }
 
-function updateBuzzDisplay() {
-  const numEl  = document.getElementById("buzz-num");
-  const wordEl = document.getElementById("buzz-word");
-  const buzz   = isBuzz(buzzN);
-  numEl.textContent  = buzzN;
-  numEl.className    = "buzz-number" + (buzz ? " is-buzz" : "");
-  if (buzz) {
-    wordEl.textContent = "BUZZ! 🔥";
-    wordEl.className   = "buzz-word say-buzz";
+// ── FESTIVAL BINGO ────────────────────────────────────────
+const BINGO_ITEMS = [
+  "Handy unter 5%","Jemand schläft im Dreck","Security überreagiert",
+  "Zelt überflutet","Falsches Camp erwischt","Essen fallen lassen",
+  "Festivalschuhe kaputt","Im Gedränge verloren","Unbekannten umarmt",
+  "Falscher Name gerufen","3 Bier in 1h","Tanzen im Regen",
+  "Shirt verloren","Fremdes Zelt betreten","Crowd Surf gesehen",
+  "Schlechte Lautsprecher","Warteschlange 30min+","Selfie mit Fremden",
+  "Wasser als Bier verkauft","Gegen Zaun gelaufen","Sonnenaufgang gesehen",
+  "Handy leer ohne Power","Schuhe im Matsch stecken","Falsche Bühne",
+  "Doppelt bezahlt","Regenschirm vergessen","Erste-Hilfe gesehen",
+  "Pforte zugelaufen","Letzter Zug verpasst","Jemand weint vor Glück",
+  "Headliner kennt keiner","Auf Schultern getragen","Bier verschüttet",
+  "Drei Sprachen gehört","Neuen Freund gefunden","Backstage-Wunsch",
+  "Bühne falsch gelesen","Gratis Merch ergattert","Zelt offen vergessen",
+  "Fundsachen abgegeben",
+];
+
+let bingoCard = [];
+let bingoMarked = [];
+
+function newBingoCard() {
+  // Pick 24 random items (center is FREE)
+  const shuffled = [...BINGO_ITEMS].sort(() => Math.random() - .5).slice(0, 24);
+  bingoCard   = [...shuffled.slice(0,12), 'FREE', ...shuffled.slice(12)];
+  bingoMarked = bingoCard.map(c => c === 'FREE');
+  saveBingo();
+  renderBingo();
+}
+
+function saveBingo() {
+  localStorage.setItem('bingo_card',   JSON.stringify(bingoCard));
+  localStorage.setItem('bingo_marked', JSON.stringify(bingoMarked));
+}
+
+function loadBingo() {
+  const c = localStorage.getItem('bingo_card');
+  const m = localStorage.getItem('bingo_marked');
+  if (c && m) {
+    bingoCard   = JSON.parse(c);
+    bingoMarked = JSON.parse(m);
+    renderBingo();
   } else {
-    wordEl.textContent = "sag: " + buzzN;
-    wordEl.className   = "buzz-word say-num";
+    newBingoCard();
   }
 }
 
-function buzzStep(dir) {
-  buzzN = Math.max(1, buzzN + dir);
-  updateBuzzDisplay();
+function toggleBingo(i) {
+  if (bingoCard[i] === 'FREE') return;
+  bingoMarked[i] = !bingoMarked[i];
+  saveBingo();
+  renderBingo();
 }
 
-function buzzReset() { buzzN = 1; updateBuzzDisplay(); }
+function checkBingo() {
+  const lines = [
+    [0,1,2,3,4],[5,6,7,8,9],[10,11,12,13,14],[15,16,17,18,19],[20,21,22,23,24], // rows
+    [0,5,10,15,20],[1,6,11,16,21],[2,7,12,17,22],[3,8,13,18,23],[4,9,14,19,24], // cols
+    [0,6,12,18,24],[4,8,12,16,20]  // diagonals
+  ];
+  const winLines = lines.filter(l => l.every(i => bingoMarked[i]));
+  return { win: winLines.length > 0, lines: winLines };
+}
+
+function renderBingo() {
+  const grid = document.getElementById('bingo-grid');
+  const status = document.getElementById('bingo-status');
+  const { win, lines } = checkBingo();
+  const winCells = new Set(lines.flat());
+  const marked = bingoMarked.filter(Boolean).length - 1; // exclude FREE
+
+  grid.innerHTML = bingoCard.map((item, i) => {
+    const isFree   = item === 'FREE';
+    const isMarked = bingoMarked[i] && !isFree;
+    const isWin    = winCells.has(i);
+    let cls = 'bingo-cell';
+    if (isFree)   cls += ' free';
+    if (isMarked) cls += ' marked';
+    if (isWin)    cls += ' bingo-line';
+    return `<div class="${cls}" onclick="toggleBingo(${i})">${isFree ? '🎉' : item}</div>`;
+  }).join('');
+
+  if (win) {
+    status.innerHTML = '<div class="bingo-win-msg">🎉 BINGO! 🎉</div>';
+  } else if (marked === 0) {
+    status.textContent = 'Tippe auf ein Feld wenn du es erlebt hast ✅';
+  } else {
+    status.textContent = `${marked} von 24 Feldern markiert`;
+  }
+}
+
+// ── GÄSTEBUCH ─────────────────────────────────────────────
+function submitGuestbook() {
+  const text = document.getElementById('gb-text').value.trim();
+  const name = document.getElementById('gb-name').value.trim() || 'Anonym';
+  if (!text) return;
+
+  const btn = document.getElementById('gb-submit');
+  btn.disabled = true;
+  btn.textContent = '⏳';
+
+  const entry = {
+    name,
+    text,
+    ts: Date.now(),
+  };
+
+  if (fbReady) {
+    db.ref('guestbook').push(entry)
+      .then(() => {
+        document.getElementById('gb-text').value = '';
+        document.getElementById('gb-name').value = '';
+        btn.disabled = false;
+        btn.textContent = '✉️ Eintragen';
+      })
+      .catch(e => {
+        console.error(e);
+        btn.disabled = false;
+        btn.textContent = '✉️ Eintragen';
+        alert('Fehler beim Speichern. Firebase eingerichtet?');
+      });
+  } else {
+    // Local fallback
+    const local = JSON.parse(localStorage.getItem('gb_local') || '[]');
+    local.unshift(entry);
+    localStorage.setItem('gb_local', JSON.stringify(local.slice(0, 50)));
+    document.getElementById('gb-text').value = '';
+    document.getElementById('gb-name').value = '';
+    btn.disabled = false;
+    btn.textContent = '✉️ Eintragen';
+    renderGuestbookEntries(local);
+  }
+}
+
+function fbListenGuestbook() {
+  const el = document.getElementById('gb-loading');
+  db.ref('guestbook').orderByChild('ts').limitToLast(60)
+    .on('value', snap => {
+      el.style.display = 'none';
+      const entries = [];
+      snap.forEach(child => entries.unshift(child.val()));
+      renderGuestbookEntries(entries);
+    });
+}
+
+function loadGuestbookLocal() {
+  const el = document.getElementById('gb-loading');
+  el.style.display = 'none';
+  const local = JSON.parse(localStorage.getItem('gb_local') || '[]');
+  if (local.length) {
+    renderGuestbookEntries(local);
+  } else {
+    document.getElementById('gb-entries').innerHTML =
+      '<div class="gb-empty">Noch keine Einträge. Sei der Erste! 🏕️<br><em style="font-size:.75rem;">(Ohne Firebase werden Einträge nur lokal gespeichert)</em></div>';
+  }
+}
+
+function renderGuestbookEntries(entries) {
+  const wrap = document.getElementById('gb-entries');
+  if (!entries.length) {
+    wrap.innerHTML = '<div class="gb-empty">Noch keine Einträge. Sei der Erste! 🏕️</div>';
+    return;
+  }
+  wrap.innerHTML = entries.map(e => {
+    const d = new Date(e.ts);
+    const time = d.toLocaleDateString('de-DE', {day:'2-digit',month:'2-digit'})
+                 + ' ' + d.toLocaleTimeString('de-DE', {hour:'2-digit',minute:'2-digit'});
+    return `<div class="gb-entry">
+      <div class="gb-entry-header">
+        <span class="gb-entry-name">🏕️ ${e.name}</span>
+        <span class="gb-entry-time">${time}</span>
+      </div>
+      <div class="gb-entry-text">${e.text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+    </div>`;
+  }).join('');
+}
 
 // ── START ─────────────────────────────────────────────────
 window.addEventListener("DOMContentLoaded", init);
@@ -2068,6 +2538,18 @@ window.addEventListener("DOMContentLoaded", init);
   <button class="bnav-btn" onclick="switchTab('games', this)">
     <span class="bnav-icon">🎮</span>
     <span class="bnav-label">Spiele</span>
+  </button>
+  <button class="bnav-btn" onclick="switchTab('conch', this)">
+    <span class="bnav-icon">🐚</span>
+    <span class="bnav-label">Muschel</span>
+  </button>
+  <button class="bnav-btn" onclick="switchTab('bingo', this)">
+    <span class="bnav-icon">🎯</span>
+    <span class="bnav-label">Bingo</span>
+  </button>
+  <button class="bnav-btn" onclick="switchTab('gb', this)">
+    <span class="bnav-icon">📖</span>
+    <span class="bnav-label">Buch</span>
   </button>
 </nav>
 
