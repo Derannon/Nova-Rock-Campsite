@@ -2399,16 +2399,18 @@ function spinSlot() {
     const endY    = -(totalH - 80 - 80); // stop so winner is in middle slot
     const dur     = 0.7 + r * 0.35;
 
-    strip.style.transition = "none";
+    // Reset: clear animation, force reflow, then restart
+    strip.style.animation = "none";
     strip.style.transform  = "translateY(0)";
-    strip.style.setProperty("--dur",  dur + "s");
-    strip.style.setProperty("--end",  endY + "px");
+    strip.offsetHeight; // force reflow so browser registers the reset
+    strip.style.setProperty("--dur", dur + "s");
+    strip.style.setProperty("--end", endY + "px");
 
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        strip.style.animation = `slotSpin ${dur}s cubic-bezier(.1,.9,.3,1) forwards`;
-      });
-    });
+    // Use increasing delay so each reel starts cleanly after reset
+    const delay = r * 60;
+    setTimeout(() => {
+      strip.style.animation = `slotSpin ${dur}s cubic-bezier(.1,.9,.3,1) forwards`;
+    }, delay);
   }
 
   const maxDur = 0.7 + 2 * 0.35 + 150;
@@ -2733,44 +2735,47 @@ function renderBingo() {
 
 // ── GÄSTEBUCH ─────────────────────────────────────────────
 function submitGuestbook() {
-  const text = document.getElementById('gb-text').value.trim();
-  const name = document.getElementById('gb-name').value.trim() || 'Anonym';
+  const textEl = document.getElementById('gb-text');
+  const nameEl = document.getElementById('gb-name');
+  const btn    = document.getElementById('gb-submit');
+
+  const text = textEl.value.trim();
+  const name = nameEl.value.trim() || 'Anonym';
   if (!text) return;
 
-  const btn = document.getElementById('gb-submit');
-  btn.disabled = true;
+  btn.disabled    = true;
   btn.textContent = '⏳';
 
-  const entry = {
-    name,
-    text,
-    ts: Date.now(),
-  };
+  const entry = { name, text, ts: Date.now() };
+
+  function onSuccess() {
+    textEl.value    = '';
+    nameEl.value    = '';
+    btn.disabled    = false;
+    btn.textContent = '✉️ Eintragen';
+    localStorage.setItem('gb_submitted', '1');
+    checkAchievement('guestbook');
+  }
+
+  function onError(e) {
+    console.error('Guestbook error:', e);
+    btn.disabled    = false;
+    btn.textContent = '✉️ Eintragen';
+    alert('Fehler beim Speichern – ist Firebase eingerichtet?');
+  }
 
   if (fbReady) {
-    db.ref('guestbook').push(entry)
-      .then(() => {
-        document.getElementById('gb-text').value = '';
-        document.getElementById('gb-name').value = '';
-        btn.disabled = false;
-        btn.textContent = '✉️ Eintragen';
-      })
-      .catch(e => {
-        console.error(e);
-        btn.disabled = false;
-        btn.textContent = '✉️ Eintragen';
-        alert('Fehler beim Speichern. Firebase eingerichtet?');
-      });
+    db.ref('guestbook').push(entry).then(onSuccess).catch(onError);
   } else {
-    // Local fallback
-    const local = JSON.parse(localStorage.getItem('gb_local') || '[]');
-    local.unshift(entry);
-    localStorage.setItem('gb_local', JSON.stringify(local.slice(0, 50)));
-    document.getElementById('gb-text').value = '';
-    document.getElementById('gb-name').value = '';
-    btn.disabled = false;
-    btn.textContent = '✉️ Eintragen';
-    renderGuestbookEntries(local);
+    try {
+      const local = JSON.parse(localStorage.getItem('gb_local') || '[]');
+      local.unshift(entry);
+      localStorage.setItem('gb_local', JSON.stringify(local.slice(0, 50)));
+      renderGuestbookEntries(local);
+      onSuccess();
+    } catch(e) {
+      onError(e);
+    }
   }
 }
 
