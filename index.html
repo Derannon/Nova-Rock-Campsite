@@ -1874,6 +1874,12 @@ function init() {
   wmtPlayers = MEMBERS.map(m => ({ name: m.name, active: true }));
   renderWMTPlayers();
 
+  // Games & Achievements
+  loadBingo();
+  trackVisitedDay();
+  renderAchievements();         // render locked/unlocked state immediately
+  setTimeout(checkAllAchievements, 900); // check auto-unlockable ones after load
+
   // Firebase
   const configured = !firebaseConfig.apiKey.includes("YOUR_");
   if (configured) {
@@ -1886,6 +1892,7 @@ function init() {
       fbListenBeerStats();
       fbListenGuestbook();
       fbListenQuotes();
+      fbListenAchievements();
     } catch(e) {
       console.warn("Firebase init failed:", e);
       showSetup();
@@ -3062,16 +3069,48 @@ const ACHIEVEMENTS = [
   },
 ];
 
+// Achievements: Firebase-first, localStorage as fallback
+// In-memory cache so we don't hammer Firebase on every check
+let achCache = null;
+
 function loadAchievements() {
+  // Always return the in-memory cache (kept in sync by Firebase listener)
+  if (achCache !== null) return achCache;
+  // Fallback: localStorage (used before Firebase listener fires or when offline)
   return JSON.parse(localStorage.getItem('achievements') || '{}');
 }
+
 function saveAchievements(ach) {
+  achCache = ach;
+  // Always persist to localStorage as reliable fallback
   localStorage.setItem('achievements', JSON.stringify(ach));
+  // Sync to Firebase if available (under users/{uid}/achievements)
+  if (fbReady) {
+    db.ref('users/' + getUID() + '/achievements').set(ach)
+      .catch(e => console.warn('Achievement save failed:', e));
+  }
+}
+
+function fbListenAchievements() {
+  db.ref('users/' + getUID() + '/achievements').on('value', snap => {
+    const fromFb = snap.val() || {};
+    // Merge: Firebase is source of truth, but keep any local-only ones too
+    const local  = JSON.parse(localStorage.getItem('achievements') || '{}');
+    const merged = { ...local, ...fromFb };
+    achCache = merged;
+    localStorage.setItem('achievements', JSON.stringify(merged));
+    // If local had entries Firebase didn't, push them up
+    if (JSON.stringify(fromFb) !== JSON.stringify(merged)) {
+      db.ref('users/' + getUID() + '/achievements').set(merged)
+        .catch(() => {});
+    }
+    renderAchievements();
+  });
 }
 
 function checkAchievement(id) {
   const ach = loadAchievements();
-  if (ach[id]) return; // already unlocked
+  if (ach[id]) return; // already unlocked – never overwrite
   const def = ACHIEVEMENTS.find(a => a.id === id);
   if (!def) return;
   if (def.check()) {
