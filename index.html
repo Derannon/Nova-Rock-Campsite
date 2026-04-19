@@ -3879,29 +3879,27 @@ function ztUpdateBankBtn() {
   const btn = document.getElementById('zt-bank-btn');
   if (ztPhase !== 'pick') { btn.disabled = true; return; }
 
-  const heldCount = ztDice.filter(d => !d.used && d.held).length;
-  const freeCount = ztDice.filter(d => !d.used).length;
-  const allHeld   = heldCount === freeCount && freeCount > 0;
-
-  // Must hold ALL scoring dice to be able to bank
+  const heldCount  = ztDice.filter(d => !d.used && d.held).length;
+  // Scoring dice that are still free (not held) – player must hold them first
   const scoringFree = ztDice.filter(d => !d.used && d._scores && !d.held).length;
 
-  if (scoringFree > 0) {
-    // Still scoring dice not yet held – can't bank yet
-    btn.disabled = true;
-    return;
-  }
+  if (scoringFree > 0 || heldCount === 0) { btn.disabled = true; return; }
 
-  if (heldCount === 0) { btn.disabled = true; return; }
+  // Always recalculate pending score fresh – never trust cached value here
+  const freshPending = ztCalcHeldScore();
+  ztPendingScore = freshPending; // keep cache in sync
+  document.getElementById('zt-turn-score').textContent = ztTurnScore + freshPending;
 
-  document.getElementById('zt-confirm-badge').classList.remove('visible');
-  const total = ztTurnScore + ztPendingScore;
+  const total = ztTurnScore + freshPending;
   const p     = ztPlayers[ztCurrentIdx];
+
   if (!p.onBoard && total < ZT_MIN_ENTRY) {
     btn.disabled = true;
     ztSetMsg(`Noch ${ZT_MIN_ENTRY - total} Punkte bis zum Einsteigen (mind. ${ZT_MIN_ENTRY}).`, 'warn');
     return;
   }
+
+  document.getElementById('zt-confirm-badge').classList.remove('visible');
   btn.disabled = false;
 }
 
@@ -3909,8 +3907,16 @@ function ztUpdateBankBtn() {
 function ztBank() {
   if (ztPhase !== 'pick') return;
 
-  ztTurnScore += ztPendingScore;
+  // Hard safety check – recalculate from scratch, never trust button state alone
+  const freshPending = ztCalcHeldScore();
+  const total = ztTurnScore + freshPending;
   const p = ztPlayers[ztCurrentIdx];
+  if (!p.onBoard && total < ZT_MIN_ENTRY) {
+    ztSetMsg(`Mindestens ${ZT_MIN_ENTRY} Punkte zum Einsteigen nötig! (Aktuell: ${total})`, 'bad');
+    return;
+  }
+
+  ztTurnScore += freshPending;
   const gained = ztTurnScore;
   p.total += gained;
   if (!p.onBoard && gained >= ZT_MIN_ENTRY) p.onBoard = true;
