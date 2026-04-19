@@ -1194,6 +1194,309 @@
       opacity: 1; transform: translateX(-50%) translateY(0);
     }
 
+
+    /* =====================================================
+       ZEHNTAUSEND
+    ===================================================== */
+    .zt-layout { display: flex; flex-direction: column; gap: 1rem; }
+
+    /* Scoreboard */
+    .zt-scoreboard {
+      display: grid; gap: 0.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    }
+    .zt-player-card {
+      background: var(--surf2); border: 2px solid var(--border);
+      border-radius: 1rem; padding: 0.85rem 1rem;
+      text-align: center; transition: all .25s; position: relative;
+      overflow: hidden;
+    }
+    .zt-player-card.active-turn {
+      border-color: var(--accent);
+      background: rgba(255,107,53,.1);
+      box-shadow: 0 0 18px rgba(255,107,53,.2);
+    }
+    .zt-player-card.winner {
+      border-color: var(--gold);
+      background: rgba(255,209,102,.12);
+      animation: pulse .5s ease 3;
+    }
+    .zt-player-card.last-round { border-color: var(--teal); }
+    .zt-player-name {
+      font-weight: 800; font-size: 0.85rem;
+      color: var(--text); white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
+    }
+    .zt-player-total {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem; line-height: 1.1;
+      color: var(--gold);
+    }
+    .zt-player-card.active-turn .zt-player-total { color: var(--accent); }
+    .zt-player-status {
+      font-size: 0.65rem; color: var(--muted);
+      letter-spacing: 1px; min-height: 1rem;
+    }
+    .zt-turn-arrow {
+      position: absolute; top: 6px; right: 8px;
+      font-size: 0.75rem; color: var(--accent); display: none;
+    }
+    .zt-player-card.active-turn .zt-turn-arrow { display: block; }
+
+    /* Dice area */
+    .zt-dice-area {
+      background: var(--surf2); border: 1px solid var(--border);
+      border-radius: 1.25rem; padding: 1.25rem;
+    }
+    .zt-turn-info {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;
+    }
+    .zt-turn-player {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem; letter-spacing: 2px; color: var(--accent);
+    }
+    .zt-turn-score-wrap { text-align: right; }
+    .zt-turn-label { font-size: 0.65rem; color: var(--muted); letter-spacing: 1px; }
+    .zt-turn-score {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem; color: var(--gold); line-height: 1;
+    }
+    .zt-confirm-badge {
+      background: rgba(255,209,102,.15); border: 1px solid var(--gold);
+      color: var(--gold); font-size: 0.72rem; font-weight: 800;
+      padding: 0.25rem 0.7rem; border-radius: 999px;
+      letter-spacing: 1px; animation: pulse 1s ease infinite;
+      display: none;
+    }
+    .zt-confirm-badge.visible { display: inline-block; }
+
+    /* Dice grid */
+    .zt-dice-grid {
+      display: flex; justify-content: center;
+      gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.1rem;
+    }
+    .zt-die {
+      width: 56px; height: 56px;
+      background: var(--surface); border: 2px solid var(--border);
+      border-radius: 0.85rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.65rem; position: relative;
+      transition: all .2s; user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .zt-die.rolling { animation: dieRoll .45s cubic-bezier(.25,1,.5,1); }
+    @keyframes dieRoll {
+      0%   { transform: rotate(0)   scale(1);    opacity: 1; }
+      25%  { transform: rotate(-15deg) scale(.8); opacity: .5; }
+      50%  { transform: rotate(10deg)  scale(.7); opacity: .3; }
+      75%  { transform: rotate(-5deg)  scale(.9); opacity: .7; }
+      100% { transform: rotate(0)   scale(1);    opacity: 1; }
+    }
+    .zt-die.held {
+      border-color: var(--teal);
+      background: rgba(6,214,160,.12);
+      transform: translateY(-6px);
+      box-shadow: 0 4px 12px rgba(6,214,160,.3);
+    }
+    .zt-die.scoring {
+      border-color: var(--gold);
+      background: rgba(255,209,102,.1);
+    }
+    .zt-die.used {
+      opacity: 0.2; cursor: default;
+      transform: none !important;
+      pointer-events: none;
+    }
+    .zt-die.confirm-phase { border-color: var(--gold); }
+    .zt-die-pts {
+      position: absolute; bottom: -1px; right: 2px;
+      font-size: 0.48rem; color: var(--teal);
+      font-weight: 900; pointer-events: none;
+    }
+
+    /* Farkle overlay */
+    .zt-farkle-flash {
+      position: absolute; inset: 0; border-radius: 1.25rem;
+      background: rgba(255,50,50,.18); pointer-events: none;
+      opacity: 0; z-index: 5;
+      animation: farkleFlash .6s ease forwards;
+    }
+    @keyframes farkleFlash {
+      0%,100% { opacity: 0; }
+      30%,70% { opacity: 1; }
+    }
+
+    /* Action buttons */
+    .zt-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+    .zt-btn {
+      flex: 1; min-width: 100px;
+      padding: 0.75rem 1rem; border-radius: 0.85rem;
+      font-weight: 800; cursor: pointer;
+      font-family: inherit; font-size: 0.9rem;
+      border: none; transition: all .2s;
+    }
+    .zt-btn:disabled { opacity: .35; cursor: not-allowed; }
+    .zt-btn.roll {
+      background: linear-gradient(135deg, var(--accent), #ff9a5c);
+      color: #fff; box-shadow: 0 3px 14px rgba(255,107,53,.35);
+    }
+    .zt-btn.roll:not(:disabled):hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255,107,53,.5);
+    }
+    .zt-btn.bank {
+      background: linear-gradient(135deg, var(--teal), #04b885);
+      color: #fff; box-shadow: 0 3px 14px rgba(6,214,160,.3);
+    }
+    .zt-btn.bank:not(:disabled):hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(6,214,160,.45);
+    }
+    .zt-btn.bank:disabled { background: var(--surf3); box-shadow: none; }
+
+    /* Message / log */
+    .zt-message {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 0.75rem; padding: 0.65rem 1rem;
+      font-size: 0.85rem; color: var(--text); min-height: 2.4rem;
+      line-height: 1.5; margin-top: 0.75rem;
+    }
+    .zt-message.good { border-color: var(--teal); color: var(--teal); }
+    .zt-message.bad  { border-color: #ff4444;     color: #ff6666; }
+    .zt-message.warn { border-color: var(--gold);  color: var(--gold); }
+
+    /* Log */
+    .zt-log {
+      max-height: 130px; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 0.25rem;
+      padding: 0.1rem;
+    }
+    .zt-log-entry {
+      font-size: 0.75rem; color: var(--muted);
+      padding: 0.2rem 0.5rem; border-radius: 0.35rem;
+      border-left: 2px solid var(--border);
+    }
+    .zt-log-entry.good { border-color: var(--teal); color: rgba(6,214,160,.8); }
+    .zt-log-entry.bad  { border-color: #ff4444; color: rgba(255,100,100,.8); }
+    .zt-log-entry.warn { border-color: var(--gold); color: rgba(255,209,102,.8); }
+
+    /* Setup screen */
+    .zt-setup { display: flex; flex-direction: column; gap: 0.85rem; }
+    .zt-setup-players {
+      display: flex; flex-wrap: wrap; gap: 0.5rem;
+    }
+    .zt-setup-player {
+      background: var(--surf2); border: 2px solid var(--border);
+      border-radius: 999px; padding: 0.4rem 1rem;
+      font-weight: 700; font-size: 0.9rem; cursor: pointer;
+      transition: all .2s; -webkit-tap-highlight-color: transparent;
+    }
+    .zt-setup-player.selected {
+      border-color: var(--accent); color: var(--accent);
+      background: rgba(255,107,53,.08);
+    }
+    .zt-setup-info {
+      font-size: 0.78rem; color: var(--muted); line-height: 1.6;
+    }
+    .zt-setup-info strong { color: var(--gold); }
+
+    /* Game over */
+    .zt-gameover {
+      text-align: center; padding: 1.5rem 1rem;
+    }
+    .zt-gameover-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3rem; letter-spacing: 3px; color: var(--gold);
+      text-shadow: 0 0 30px rgba(255,209,102,.5);
+    }
+    .zt-gameover-sub { color: var(--muted); margin-bottom: 1.25rem; }
+    .zt-final-scores { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.25rem; }
+    .zt-final-row {
+      display: flex; justify-content: space-between;
+      align-items: center; padding: 0.6rem 1rem;
+      background: var(--surf2); border-radius: 0.75rem;
+      border: 1px solid var(--border);
+    }
+    .zt-final-row.top { border-color: var(--gold); background: rgba(255,209,102,.08); }
+    .zt-final-rank { font-size: 1.1rem; width: 28px; }
+    .zt-final-name { font-weight: 800; flex: 1; margin-left: 0.5rem; }
+    .zt-final-pts {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem; color: var(--gold);
+    }
+
+
+    /* =====================================================
+       FAQ / REGELWERK MODAL
+    ===================================================== */
+    .faq-overlay {
+      position: fixed; inset: 0; z-index: 400;
+      background: rgba(0,0,0,.7); backdrop-filter: blur(6px);
+      display: none; align-items: flex-end; justify-content: center;
+      padding-bottom: env(safe-area-inset-bottom,0);
+    }
+    .faq-overlay.open { display: flex; animation: fadeIn .2s ease; }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+    .faq-sheet {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 1.5rem 1.5rem 0 0;
+      width: 100%; max-width: 680px;
+      max-height: 85vh; overflow-y: auto;
+      padding: 0 1.5rem 2rem;
+    }
+    .faq-sheet::-webkit-scrollbar { width: 4px; }
+    .faq-sheet::-webkit-scrollbar-thumb { background: var(--surf3); border-radius: 2px; }
+    .faq-handle-row {
+      position: sticky; top: 0;
+      background: var(--surface);
+      padding: 0.75rem 0 0.5rem;
+      display: flex; align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1rem;
+      z-index: 1;
+    }
+    .faq-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem; letter-spacing: 2px; color: var(--gold);
+    }
+    .faq-close {
+      background: var(--surf2); border: 1px solid var(--border);
+      color: var(--muted); width: 30px; height: 30px;
+      border-radius: 50%; cursor: pointer; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .2s;
+    }
+    .faq-close:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .faq-section { margin-bottom: 1.25rem; }
+    .faq-section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem; letter-spacing: 2px;
+      color: var(--accent); margin-bottom: 0.5rem;
+      padding-bottom: 0.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .faq-row {
+      display: flex; gap: 0.75rem; align-items: baseline;
+      padding: 0.35rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 0.88rem;
+    }
+    .faq-row:last-child { border-bottom: none; }
+    .faq-dice { font-size: 1rem; min-width: 28px; text-align: center; }
+    .faq-pts { color: var(--gold); font-weight: 800; min-width: 70px; }
+    .faq-desc { color: var(--muted); line-height: 1.5; }
+    .faq-desc strong { color: var(--text); }
+    .faq-note {
+      background: rgba(255,209,102,.08); border: 1px solid rgba(255,209,102,.2);
+      border-radius: 0.65rem; padding: 0.7rem 0.9rem;
+      font-size: 0.82rem; color: var(--muted); line-height: 1.6;
+      margin-top: 0.5rem;
+    }
+    .faq-note strong { color: var(--gold); }
+
   </style>
 </head>
 
@@ -1713,6 +2016,101 @@
 
   </div><!-- /tab-ach -->
 
+  <!-- ═══════════════════════════════════════════════════
+       TAB: ZEHNTAUSEND
+  ═══════════════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-zt">
+
+    <section class="hero" style="padding-top:1.5rem;">
+      <div class="hero-eyebrow">Erste Person auf 10.000 gewinnt</div>
+      <h1 class="hero-title" style="font-size:clamp(2.4rem,10vw,5rem);">
+        ZEHN<br><span class="ht-sub">TAUSEND</span>
+      </h1>
+    </section>
+
+    <div class="card">
+      <!-- SETUP VIEW -->
+      <div id="zt-setup-view">
+        <h2 class="card-title">🎲 Spieler wählen</h2>
+        <div class="zt-setup">
+          <p class="text-muted" style="margin-bottom:.25rem;">Wer spielt mit? (min. 2)</p>
+          <div class="zt-setup-players" id="zt-setup-players"></div>
+          <div class="zt-setup-info">
+            <strong>Regeln:</strong> Mind. <strong>350 Pkt.</strong> zum Einsteigen ·
+            1er = 100 · 5er = 50 · Drilling = Zahl×100 (1er = 1000) ·
+            Straße (1-6) = 3000 · 3 Paare = 1000 ·
+            Alle 6 wertend → Pflicht-Bestätigungswurf!
+          </div>
+          <div style="display:flex;gap:.6rem;">
+            <button class="game-btn" id="zt-start-btn" onclick="ztStart()" style="margin-top:.25rem;flex:2;">
+              🎲 Spiel starten!
+            </button>
+            <button class="game-btn" onclick="openFaq()" style="margin-top:.25rem;flex:1;opacity:.75;">
+              📋 Regeln
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- GAME VIEW -->
+      <div id="zt-game-view" style="display:none;">
+        <div class="zt-layout">
+
+          <!-- Scoreboard -->
+          <div class="zt-scoreboard" id="zt-scoreboard"></div>
+
+          <!-- Dice area -->
+          <div class="zt-dice-area" style="position:relative;" id="zt-dice-area">
+            <div class="zt-turn-info">
+              <div>
+                <div style="display:flex;align-items:center;gap:.6rem;">
+                <div class="zt-turn-player" id="zt-turn-player">–</div>
+                <button onclick="openFaq()" style="background:var(--surf3);border:1px solid var(--border);color:var(--muted);border-radius:999px;padding:.2rem .65rem;font-size:.75rem;cursor:pointer;font-weight:800;-webkit-tap-highlight-color:transparent;">📋 Regeln</button>
+              </div>
+                <span class="zt-confirm-badge" id="zt-confirm-badge">⚡ BESTÄTIGUNG!</span>
+              </div>
+              <div class="zt-turn-score-wrap">
+                <div class="zt-turn-label">PUNKTE DIESEN ZUG</div>
+                <div class="zt-turn-score" id="zt-turn-score">0</div>
+              </div>
+            </div>
+
+            <div class="zt-dice-grid" id="zt-dice-grid">
+              <!-- 6 dice rendered by JS -->
+            </div>
+
+            <div class="zt-actions">
+              <button class="zt-btn roll" id="zt-roll-btn" onclick="ztRoll()">🎲 Würfeln</button>
+              <button class="zt-btn bank" id="zt-bank-btn" onclick="ztBank()" disabled>
+                ✅ Punkte kassieren
+              </button>
+            </div>
+
+            <div class="zt-message" id="zt-message">Würfle um zu beginnen!</div>
+          </div>
+
+          <!-- Log -->
+          <div class="card" style="padding:1rem;">
+            <h2 class="card-title" style="font-size:1.1rem;margin-bottom:.6rem;">📜 Verlauf</h2>
+            <div class="zt-log" id="zt-log"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- GAME OVER VIEW -->
+      <div id="zt-gameover-view" style="display:none;">
+        <div class="zt-gameover">
+          <div class="zt-gameover-title">🏆 SPIEL VORBEI!</div>
+          <p class="zt-gameover-sub" id="zt-winner-text"></p>
+          <div class="zt-final-scores" id="zt-final-scores"></div>
+          <button class="game-btn" onclick="ztRestart()">🎲 Neues Spiel</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tab-zt -->
+
 </main>
 
 <!-- =========================================================
@@ -1833,7 +2231,7 @@ const COOLDOWN_SEC = 10;
 //     2. Gib deinen gewünschten PIN ein
 //     3. Kopiere den Hash hierher
 //     Aktueller PIN: "1234"  ← vor dem Festival durch eigenen ersetzen!
-const ADMIN_PIN_HASH = "5c183439664d7ac2790fa3a6ccdcedfb91bd7c4566840e962fc40be088207e80";
+const ADMIN_PIN_HASH = "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4";
 
 // 11. FIREBASE KONFIGURATION
 //     Hole dir diese Werte aus: console.firebase.google.com
@@ -1876,6 +2274,7 @@ function init() {
 
   // Games & Achievements
   loadBingo();
+  ztInitSetup();
   trackVisitedDay();
   renderAchievements();         // render locked/unlocked state immediately
   setTimeout(checkAllAchievements, 900); // check auto-unlockable ones after load
@@ -2824,7 +3223,7 @@ function renderGuestbookEntries(entries) {
 
 
 // ── MEHR DRAWER ───────────────────────────────────────────
-const MEHR_TABS = ['stats','conch','bingo','gb','ach'];
+const MEHR_TABS = ['stats','conch','bingo','gb','ach','zt'];
 let mehrOpen = false;
 
 function toggleMehr(btn) {
@@ -3182,6 +3581,436 @@ function trackConch() {
   checkAchievement('conch_5');
 }
 
+
+// ══════════════════════════════════════════════════════════
+// ZEHNTAUSEND
+// ══════════════════════════════════════════════════════════
+
+// ── Constants ──────────────────────────────────────────
+const ZT_GOAL        = 10000;
+const ZT_MIN_ENTRY   = 350;
+const ZT_FACES       = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+
+// ── State ───────────────────────────────────────────────
+let ztPlayers       = [];   // [{name, total, onBoard}]
+let ztSetupSelected = [];   // names chosen in setup
+let ztCurrentIdx    = 0;    // whose turn
+let ztDice          = [];   // [{val:1-6, held:bool, used:bool}]
+let ztTurnScore     = 0;    // accumulated this turn
+let ztPendingScore  = 0;    // points from dice held THIS roll (not yet added to turnScore)
+let ztHasRolled     = false;
+let ztPhase         = 'roll'; // 'roll' | 'pick' | 'confirm' | 'done'
+let ztLastRound     = false;
+let ztLastRoundInitiator = -1;
+let ztLog           = [];
+let ztRolling       = false;
+
+// ── Setup ───────────────────────────────────────────────
+function ztInitSetup() {
+  const wrap = document.getElementById('zt-setup-players');
+  if (!wrap) return;
+  const names = MEMBERS.map(m => m.name);
+  ztSetupSelected = [...names]; // pre-select all
+  wrap.innerHTML = names.map(n =>
+    `<button class="zt-setup-player selected" onclick="ztTogglePlayer('${n}',this)">${n}</button>`
+  ).join('');
+}
+
+function ztTogglePlayer(name, btn) {
+  const idx = ztSetupSelected.indexOf(name);
+  if (idx === -1) {
+    ztSetupSelected.push(name);
+    btn.classList.add('selected');
+  } else {
+    if (ztSetupSelected.length <= 2) return; // min 2
+    ztSetupSelected.splice(idx, 1);
+    btn.classList.remove('selected');
+  }
+}
+
+function ztStart() {
+  if (ztSetupSelected.length < 2) { alert('Mindestens 2 Spieler!'); return; }
+  ztPlayers = ztSetupSelected.map(n => ({ name: n, total: 0, onBoard: false }));
+  ztCurrentIdx = 0;
+  ztLog = [];
+  ztLastRound = false;
+  ztLastRoundInitiator = -1;
+  document.getElementById('zt-setup-view').style.display = 'none';
+  document.getElementById('zt-game-view').style.display  = 'block';
+  ztBeginTurn();
+}
+
+function ztRestart() {
+  document.getElementById('zt-gameover-view').style.display = 'none';
+  document.getElementById('zt-setup-view').style.display    = 'block';
+  ztInitSetup();
+}
+
+// ── Turn management ─────────────────────────────────────
+function ztBeginTurn() {
+  ztDice        = Array(6).fill(null).map(() => ({ val: 0, held: false, used: false }));
+  ztTurnScore   = 0;
+  ztPendingScore= 0;
+  ztHasRolled   = false;
+  ztPhase       = 'roll';
+  ztRenderScoreboard();
+  ztRenderDice();
+  ztSetMsg(`${ztPlayers[ztCurrentIdx].name} ist dran – würfle!`, '');
+  document.getElementById('zt-turn-player').textContent = ztPlayers[ztCurrentIdx].name;
+  document.getElementById('zt-turn-score').textContent  = '0';
+  document.getElementById('zt-confirm-badge').classList.remove('visible');
+  document.getElementById('zt-roll-btn').disabled = false;
+  document.getElementById('zt-bank-btn').disabled = true;
+  ztSetRollBtn(false);
+}
+
+function ztSetRollBtn(confirmMode) {
+  const btn = document.getElementById('zt-roll-btn');
+  if (confirmMode) {
+    btn.textContent = '⚡ Bestätigen!';
+    btn.style.background = 'linear-gradient(135deg,var(--gold),#ffb700)';
+    btn.style.color = '#1a1000';
+    btn.style.boxShadow = '0 3px 14px rgba(255,209,102,.4)';
+  } else {
+    btn.textContent = '🎲 Würfeln';
+    btn.style.background = '';
+    btn.style.color = '';
+    btn.style.boxShadow = '';
+  }
+}
+
+function ztNextTurn() {
+  // Check last-round end condition
+  if (ztLastRound) {
+    ztCurrentIdx = (ztCurrentIdx + 1) % ztPlayers.length;
+    if (ztCurrentIdx === ztLastRoundInitiator) { ztEndGame(); return; }
+  } else {
+    ztCurrentIdx = (ztCurrentIdx + 1) % ztPlayers.length;
+  }
+  ztBeginTurn();
+}
+
+// ── Scoring logic ────────────────────────────────────────
+function ztScoreDice(vals) {
+  // Returns {score, scoringMask} where scoringMask[i]=true means die i scores
+  // vals: array of die values (only free/unheld dice)
+  const n = vals.length;
+  const counts = Array(7).fill(0);
+  vals.forEach(v => counts[v]++);
+  const mask = Array(n).fill(false);
+
+  // Helper: mark first `k` occurrences of value `v`
+  function markN(v, k) {
+    let marked = 0;
+    for (let i = 0; i < n && marked < k; i++) {
+      if (vals[i] === v && !mask[i]) { mask[i] = true; marked++; }
+    }
+  }
+
+  let score = 0;
+
+  // --- Straße 1-2-3-4-5-6 (only with exactly 6 dice) ---
+  if (n === 6) {
+    const sorted = [...vals].sort((a,b)=>a-b);
+    if (sorted.join('') === '123456') {
+      mask.fill(true);
+      return { score: 3000, mask };
+    }
+    // 3 Paare
+    const pairCounts = counts.filter(c => c === 2).length;
+    if (pairCounts === 3) {
+      mask.fill(true);
+      return { score: 1000, mask };
+    }
+  }
+
+  // --- Multiples (6,5,4,3 of a kind) ---
+  for (let v = 1; v <= 6; v++) {
+    const c = counts[v];
+    if (c >= 3) {
+      const base = v === 1 ? 1000 : v * 100;
+      let pts = base;
+      if (c >= 4) pts *= 2;
+      if (c >= 5) pts *= 2;
+      if (c >= 6) pts *= 2;
+      score += pts;
+      markN(v, c); // mark ALL dice of this value as scoring
+    }
+  }
+
+  // --- Singles: 1s and 5s (only if not already part of a multiple) ---
+  for (let i = 0; i < n; i++) {
+    if (!mask[i]) {
+      if (vals[i] === 1) { score += 100; mask[i] = true; }
+      if (vals[i] === 5) { score +=  50; mask[i] = true; }
+    }
+  }
+
+  return { score, mask };
+}
+
+// ── Roll ─────────────────────────────────────────────────
+function ztRoll() {
+  if (ztRolling) return;
+
+  if (ztPhase === 'confirm') {
+    // BESTÄTIGUNGSWURF: commit all pending score, free ALL 6 dice, roll fresh
+    ztTurnScore   += ztPendingScore;
+    ztPendingScore = 0;
+    ztDice = Array(6).fill(null).map(() => ({ val: 0, held: false, used: false, _scores: false }));
+    // Fall through to roll logic below (freeDice will be all 6)
+    ztPhase = 'rolling';
+    document.getElementById('zt-confirm-badge').classList.remove('visible');
+    ztSetRollBtn(false); // back to normal label during roll
+  } else if (ztHasRolled) {
+    // Normal re-roll: must have held at least one scoring die
+    const justHeld = ztDice.filter(d => !d.used && d.held);
+    if (justHeld.length === 0) {
+      ztSetMsg('Du musst zuerst mindestens einen wertenden Würfel halten!', 'bad');
+      return;
+    }
+    ztTurnScore   += ztPendingScore;
+    ztPendingScore = 0;
+    ztDice.forEach(d => { if (d.held) d.used = true; d.held = false; });
+  }
+
+  // Figure out which dice to roll
+  const freeDice = ztDice.filter(d => !d.used);
+  if (freeDice.length === 0) return;
+
+  ztRolling = true;
+  ztPhase   = 'rolling';
+  document.getElementById('zt-roll-btn').disabled = true;
+  document.getElementById('zt-bank-btn').disabled = true;
+
+  // Animate roll
+  ztRenderDice(true); // show rolling animation
+
+  setTimeout(() => {
+    // Assign new random values to free dice
+    ztDice.forEach(d => { if (!d.used) d.val = Math.ceil(Math.random() * 6); });
+    ztHasRolled = true;
+
+    // Score free dice
+    const freeDiceNow = ztDice.filter(d => !d.used);
+    const freeVals    = freeDiceNow.map(d => d.val);
+    const { score, mask } = ztScoreDice(freeVals);
+
+    // Map mask back to original dice array
+    let mi = 0;
+    ztDice.forEach(d => { if (!d.used) { d._scores = mask[mi++]; } });
+
+    if (score === 0) {
+      // FARKLE
+      ztFarkle();
+      return;
+    }
+
+    ztPhase = 'pick';
+    ztRolling = false;
+    ztRenderDice();
+
+    const allScore = ztDice.filter(d => !d.used).every(d => d._scores);
+    if (allScore) {
+      // All dice score → auto-hold all, switch to confirm phase
+      ztDice.forEach(d => { if (!d.used) { d.held = true; } });
+      ztPendingScore = ztCalcHeldScore();
+      document.getElementById('zt-turn-score').textContent = ztTurnScore + ztPendingScore;
+      ztPhase = 'confirm';
+      document.getElementById('zt-confirm-badge').classList.add('visible');
+      ztSetMsg('⚡ Alle Würfel wertend – Pflicht-Bestätigungswurf! Klicke "Bestätigen".', 'warn');
+      ztSetRollBtn(true); // change button label to "Bestätigen"
+      document.getElementById('zt-roll-btn').disabled = false;
+      document.getElementById('zt-bank-btn').disabled = true;
+    } else {
+      ztSetMsg('Wähle wertende Würfel zum Halten, dann weiter würfeln oder kassieren.', '');
+      document.getElementById('zt-roll-btn').disabled = false;
+      ztUpdateBankBtn();
+    }
+  }, 480);
+}
+
+function ztFarkle() {
+  ztRolling = false;
+  ztPhase   = 'farkle';
+
+  // Farkle flash
+  const area = document.getElementById('zt-dice-area');
+  const flash = document.createElement('div');
+  flash.className = 'zt-farkle-flash';
+  area.appendChild(flash);
+  setTimeout(() => flash.remove(), 700);
+
+  ztRenderDice();
+  const total = ztTurnScore + ztPendingScore;
+  ztAddLog(`💀 ${ztPlayers[ztCurrentIdx].name}: NIETE! ${total > 0 ? total + ' Pkt. verloren' : ''}`, 'bad');
+  ztSetMsg(`💀 NIETE! Alle ${total > 0 ? total + ' Punkte' : 'Punkte'} verloren!`, 'bad');
+
+  document.getElementById('zt-roll-btn').disabled = true;
+  document.getElementById('zt-bank-btn').disabled = true;
+
+  setTimeout(ztNextTurn, 1800);
+}
+
+// ── Dice interaction ─────────────────────────────────────
+function ztToggleDie(i) {
+  const d = ztDice[i];
+  if (d.used || !ztHasRolled || ztPhase !== 'pick') return;
+  if (!d._scores) return; // can't hold non-scoring die
+
+  d.held = !d.held;
+
+  // Recalculate pending score from all currently held (not-used) dice
+  ztPendingScore = ztCalcHeldScore();
+  ztRenderDice();
+  ztUpdateBankBtn();
+  document.getElementById('zt-turn-score').textContent = ztTurnScore + ztPendingScore;
+}
+
+function ztCalcHeldScore() {
+  // Score ALL currently-held (not yet used) dice together
+  const held = ztDice.filter(d => !d.used && d.held);
+  if (!held.length) return 0;
+  const vals = held.map(d => d.val);
+  return ztScoreDice(vals).score;
+}
+
+function ztUpdateBankBtn() {
+  const btn = document.getElementById('zt-bank-btn');
+  if (ztPhase !== 'pick') { btn.disabled = true; return; }
+
+  const heldCount = ztDice.filter(d => !d.used && d.held).length;
+  const freeCount = ztDice.filter(d => !d.used).length;
+  const allHeld   = heldCount === freeCount && freeCount > 0;
+
+  // Must hold ALL scoring dice to be able to bank
+  const scoringFree = ztDice.filter(d => !d.used && d._scores && !d.held).length;
+
+  if (scoringFree > 0) {
+    // Still scoring dice not yet held – can't bank yet
+    btn.disabled = true;
+    return;
+  }
+
+  if (heldCount === 0) { btn.disabled = true; return; }
+
+  document.getElementById('zt-confirm-badge').classList.remove('visible');
+  const total = ztTurnScore + ztPendingScore;
+  const p     = ztPlayers[ztCurrentIdx];
+  if (!p.onBoard && total < ZT_MIN_ENTRY) {
+    btn.disabled = true;
+    ztSetMsg(`Noch ${ZT_MIN_ENTRY - total} Punkte bis zum Einsteigen (mind. ${ZT_MIN_ENTRY}).`, 'warn');
+    return;
+  }
+  btn.disabled = false;
+}
+
+// ── Bank ─────────────────────────────────────────────────
+function ztBank() {
+  if (ztPhase !== 'pick') return;
+
+  ztTurnScore += ztPendingScore;
+  const p = ztPlayers[ztCurrentIdx];
+  const gained = ztTurnScore;
+  p.total += gained;
+  if (!p.onBoard && gained >= ZT_MIN_ENTRY) p.onBoard = true;
+
+  ztAddLog(`✅ ${p.name} kassiert ${gained} Pkt. → Gesamt: ${p.total}`, 'good');
+  ztSetMsg(`✅ ${gained} Punkte kassiert! Gesamt: ${p.total}`, 'good');
+
+  // Last round trigger
+  if (!ztLastRound && p.total >= ZT_GOAL) {
+    ztLastRound = true;
+    ztLastRoundInitiator = ztCurrentIdx;
+    ztAddLog(`🏁 ${p.name} hat ${ZT_GOAL} erreicht! Letzter Zug für alle anderen.`, 'warn');
+  }
+
+  document.getElementById('zt-roll-btn').disabled = true;
+  document.getElementById('zt-bank-btn').disabled = true;
+  ztRenderScoreboard();
+  setTimeout(ztNextTurn, 1400);
+}
+
+// ── Render ───────────────────────────────────────────────
+function ztRenderDice(rolling = false) {
+  const grid = document.getElementById('zt-dice-grid');
+  grid.innerHTML = ztDice.map((d, i) => {
+    let cls = 'zt-die';
+    if (d.used)  cls += ' used';
+    else if (d.held) cls += ' held';
+    else if (d._scores && ztHasRolled) cls += ' scoring';
+    if (rolling && !d.used) cls += ' rolling';
+
+    const pts = d.held && d._scores
+      ? `<span class="zt-die-pts">+${ztScoreDice([d.val]).score}</span>` : '';
+
+    const face = d.val ? ZT_FACES[d.val - 1] : '🎲';
+    return `<div class="${cls}" onclick="ztToggleDie(${i})">${face}${pts}</div>`;
+  }).join('');
+}
+
+function ztRenderScoreboard() {
+  const wrap = document.getElementById('zt-scoreboard');
+  wrap.innerHTML = ztPlayers.map((p, i) => {
+    let cls = 'zt-player-card';
+    if (i === ztCurrentIdx) cls += ' active-turn';
+    if (p.total >= ZT_GOAL)  cls += ' winner';
+    else if (ztLastRound)    cls += ' last-round';
+
+    let status = p.onBoard ? '' : `Noch nicht eingestiegen`;
+    if (ztLastRound && i !== ztLastRoundInitiator && i !== ztCurrentIdx) status = '⏳ Letzter Zug';
+    if (p.total >= ZT_GOAL) status = '🏆 Ziel erreicht!';
+
+    return `<div class="${cls}">
+      <div class="zt-turn-arrow">▶</div>
+      <div class="zt-player-name">${p.name}</div>
+      <div class="zt-player-total">${p.total}</div>
+      <div class="zt-player-status">${status}</div>
+    </div>`;
+  }).join('');
+}
+
+function ztSetMsg(text, type) {
+  const el = document.getElementById('zt-message');
+  el.textContent = text;
+  el.className   = 'zt-message' + (type ? ' ' + type : '');
+}
+
+function ztAddLog(text, type) {
+  ztLog.unshift({ text, type });
+  if (ztLog.length > 40) ztLog.pop();
+  const logEl = document.getElementById('zt-log');
+  if (logEl) {
+    logEl.innerHTML = ztLog.map(e =>
+      `<div class="zt-log-entry ${e.type || ''}">${e.text}</div>`
+    ).join('');
+  }
+}
+
+// ── Game over ────────────────────────────────────────────
+function ztEndGame() {
+  document.getElementById('zt-game-view').style.display     = 'none';
+  document.getElementById('zt-gameover-view').style.display = 'block';
+
+  const sorted = [...ztPlayers].sort((a, b) => b.total - a.total);
+  const medals = ['🥇','🥈','🥉'];
+
+  document.getElementById('zt-winner-text').textContent =
+    `🎉 ${sorted[0].name} gewinnt mit ${sorted[0].total} Punkten!`;
+
+  document.getElementById('zt-final-scores').innerHTML = sorted.map((p, i) =>
+    `<div class="zt-final-row ${i === 0 ? 'top' : ''}">
+      <span class="zt-final-rank">${medals[i] || (i+1)+'.'}</span>
+      <span class="zt-final-name">${p.name}</span>
+      <span class="zt-final-pts">${p.total}</span>
+    </div>`
+  ).join('');
+}
+
+
+// ── FAQ ───────────────────────────────────────────────────
+function openFaq()  { document.getElementById('faq-overlay').classList.add('open'); }
+function closeFaq() { document.getElementById('faq-overlay').classList.remove('open'); }
 // ── START ─────────────────────────────────────────────────
 window.addEventListener("DOMContentLoaded", init);
 </script>
@@ -3210,6 +4039,10 @@ window.addEventListener("DOMContentLoaded", init);
       <span class="mehr-item-icon">📖</span>
       <span class="mehr-item-label">Gästebuch</span>
     </div>
+    <div class="mehr-item" id="mehr-zt" onclick="switchFromMehr('zt')">
+      <span class="mehr-item-icon">🎲</span>
+      <span class="mehr-item-label">Zehntausend</span>
+    </div>
     <div class="mehr-item" id="mehr-ach" onclick="switchFromMehr('ach')">
       <span class="mehr-item-icon">🏆</span>
       <span class="mehr-item-label">Badges</span>
@@ -3236,6 +4069,66 @@ window.addEventListener("DOMContentLoaded", init);
     <span class="bnav-label">Mehr</span>
   </button>
 </nav>
+
+
+<!-- FAQ / REGELWERK MODAL -->
+<div class="faq-overlay" id="faq-overlay" onclick="if(event.target===this) closeFaq()">
+  <div class="faq-sheet">
+    <div class="faq-handle-row">
+      <span class="faq-title">🎲 Zehntausend – Regeln</span>
+      <button class="faq-close" onclick="closeFaq()">✕</button>
+    </div>
+
+    <div class="faq-section">
+      <div class="faq-section-title">🎯 Ziel</div>
+      <p class="faq-desc" style="padding:.3rem 0;">Als Erster <strong style="color:var(--gold)">10.000 Punkte</strong> erreichen. Wer 10.000 knackt, bekommen alle anderen noch einen letzten Zug.</p>
+    </div>
+
+    <div class="faq-section">
+      <div class="faq-section-title">💰 Punktewertung</div>
+      <div class="faq-row"><span class="faq-dice">⚀</span><span class="faq-pts">100 Pkt.</span><span class="faq-desc">Einzelne <strong>1</strong></span></div>
+      <div class="faq-row"><span class="faq-dice">⚄</span><span class="faq-pts">50 Pkt.</span><span class="faq-desc">Einzelne <strong>5</strong></span></div>
+      <div class="faq-row"><span class="faq-dice">3×</span><span class="faq-pts">Zahl×100</span><span class="faq-desc"><strong>Drilling</strong> – z.B. 3×4 = 400 Pkt.</span></div>
+      <div class="faq-row"><span class="faq-dice">3×⚀</span><span class="faq-pts">1.000 Pkt.</span><span class="faq-desc"><strong>Einer-Drilling</strong> (Sonderregel)</span></div>
+      <div class="faq-row"><span class="faq-dice">4×</span><span class="faq-pts">Drilling×2</span><span class="faq-desc"><strong>Vierling</strong></span></div>
+      <div class="faq-row"><span class="faq-dice">5×</span><span class="faq-pts">Drilling×4</span><span class="faq-desc"><strong>Fünfling</strong></span></div>
+      <div class="faq-row"><span class="faq-dice">6×</span><span class="faq-pts">Drilling×8</span><span class="faq-desc"><strong>Sechsling</strong></span></div>
+      <div class="faq-row"><span class="faq-dice">🎲</span><span class="faq-pts">3.000 Pkt.</span><span class="faq-desc"><strong>Straße</strong> – 1, 2, 3, 4, 5, 6 (nur mit 6 Würfeln)</span></div>
+      <div class="faq-row"><span class="faq-dice">👥</span><span class="faq-pts">1.000 Pkt.</span><span class="faq-desc"><strong>3 Paare</strong> – z.B. 2×1, 2×3, 2×5 (nur mit 6 Würfeln)</span></div>
+    </div>
+
+    <div class="faq-section">
+      <div class="faq-section-title">🔄 Ablauf eines Zuges</div>
+      <div class="faq-row"><span class="faq-dice">1.</span><span class="faq-desc" style="min-width:0">Alle 6 Würfel werfen.</span></div>
+      <div class="faq-row"><span class="faq-dice">2.</span><span class="faq-desc">Mindestens einen <strong>wertenden</strong> Würfel antippen & halten.</span></div>
+      <div class="faq-row"><span class="faq-dice">3.</span><span class="faq-desc">Entscheiden: <strong>Kassieren</strong> oder <strong>Weiterwürfeln</strong> (Risiko!).</span></div>
+      <div class="faq-row"><span class="faq-dice">4.</span><span class="faq-desc">Beim Kassieren: mind. <strong>350 Pkt.</strong> nötig um ins Spiel einzusteigen.</span></div>
+    </div>
+
+    <div class="faq-section">
+      <div class="faq-section-title">⚡ Bestätigungswurf</div>
+      <div class="faq-note">
+        <strong>Wenn alle 6 Würfel wertend sind</strong>, musst du einen Pflicht-Bestätigungswurf machen:<br><br>
+        → Alle Würfel werden gutgeschrieben<br>
+        → Du würfelst <strong>alle 6 neu</strong> (Pflicht – kein Stopp möglich!)<br>
+        → <strong>Niete beim Bestätigungswurf</strong> = gesamter Zug verloren<br>
+        → <strong>Mind. 1 wertender Würfel</strong> = du kannst aufhören oder weitermachen<br>
+        → <strong>Wieder alle 6 wertend</strong> = erneuter Bestätigungswurf (Kette!)
+      </div>
+    </div>
+
+    <div class="faq-section">
+      <div class="faq-section-title">💀 Niete (Farkle)</div>
+      <p class="faq-desc" style="padding:.3rem 0;">Kein einziger Würfel im aktuellen Wurf ist wertend → <strong style="color:#ff6666">alle Punkte des gesamten Zuges</strong> sind verloren. Nächster Spieler.</p>
+    </div>
+
+    <div class="faq-section">
+      <div class="faq-section-title">🏁 Spielende</div>
+      <p class="faq-desc" style="padding:.3rem 0;">Sobald jemand <strong>10.000 Punkte</strong> erreicht und kassiert, haben <strong>alle anderen noch genau einen letzten Zug</strong> um mehr Punkte zu holen. Dann gewinnt der mit den meisten Punkten.</p>
+    </div>
+
+  </div>
+</div>
 
 </body>
 </html>
