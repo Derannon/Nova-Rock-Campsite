@@ -6,10 +6,6 @@
   <meta name="theme-color" content="#11071f">
   <meta name="description" content="Nova Rock Camp Website mit Biertracker, Gästebuch, Stats und Minispielen.">
   <title>Nova Rock Camp</title>
-  <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="./favicon-192.png">
-  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
-  <meta name="theme-color" content="#121212">
   <style>
     :root {
       color-scheme: dark;
@@ -1380,6 +1376,7 @@
             <p class="eyebrow">Zuhause auf Zeit</p>
             <h2 class="split-title"><span>Unser</span><span>Camp</span></h2>
           </div>
+          
         </div>
 
         <div class="grid two">
@@ -1387,7 +1384,7 @@
             <div class="media-wrap" id="campImageWrap">
               <img id="campImage" alt="Camp Foto" loading="lazy">
             </div>
-            <div class="media-caption" id="campImageCaption">Camp-Foto aus dem Ordner fotos/.</div>
+            <div class="media-caption" id="campImageCaption">Camp-Foto</div>
           </article>
 
           <article class="card">
@@ -1410,7 +1407,7 @@
             <div class="media-wrap" id="mapImageWrap">
               <img id="mapImage" alt="Camp Standort Karte" loading="lazy">
             </div>
-            <div class="media-caption">Standortbild</code></div>
+            <div class="media-caption">Standortbild: <code>fotos/Standort.png</code></div>
           </article>
 
           <article class="card">
@@ -1658,6 +1655,7 @@
                 <textarea class="textarea" id="guestMessage" maxlength="240" required placeholder="Grüße ans Camp!"></textarea>
               </label>
               <button class="primary-btn" type="submit">Eintragen</button>
+              <p class="small muted" id="guestHint">Im Lokalmodus wird dein Eintrag nur auf diesem Gerät gespeichert.</p>
             </form>
           </article>
 
@@ -1812,12 +1810,16 @@
         {
           name: "Sina",
           role: "Playlist-Development",
-          bio: "Hat einen Song für jede Stimmung",
+          bio: "Hat einen Song für jede Stimmung,
           emoji: "🤘",
           image: "fotos/Sina.jpg"
         }
       ],
       quotes: [
+        "Nur kurz hinlegen.",
+        "Das ist kein Müll, das ist Camp-Deko.",
+        "Wer hat den Dosenöffner?",
+        "Wir gehen wirklich früh schlafen. Ganz sicher."
       ],
       tasks: [
       "Mach ein Gruppenfoto mit der Crew.",
