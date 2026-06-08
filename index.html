@@ -2433,7 +2433,7 @@
         renderQuote();
       });
       byId("quoteFormToggle").addEventListener("click", () => byId("quoteForm").classList.toggle("hidden"));
-      byId("quoteForm").addEventListener("submit", event => {
+      byId("quoteForm").addEventListener("submit", async event => {
         event.preventDefault();
         const passwordInput = byId("quotePasswordInput");
         const input = byId("quoteInput");
@@ -2449,7 +2449,7 @@
           input.focus();
           return;
         }
-        
+
         if (state.firebase.ready) {
           try {
             const { ref, push, set, serverTimestamp } = state.firebase.api;
@@ -2477,7 +2477,7 @@
             showToast("Firebase hat das Zitat abgelehnt. Lokal gespeichert.");
           }
         }
-        
+
         const quotes = storeGet("localQuotes", []);
         quotes.push(quote);
         storeSet("localQuotes", quotes.slice(-40));
@@ -2799,7 +2799,8 @@
         snapshot.forEach(child => entries.push({ id: child.key, ...child.val() }));
         state.guestEntries = entries.sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
         renderGuestbook();
-              }));
+      }));
+
       const quoteQuery = query(ref(db, rootPath("quotes")), orderByChild("createdAt"), limitToLast(80));
       state.firebase.listeners.push(onValue(quoteQuery, snapshot => {
         const quotes = [];
