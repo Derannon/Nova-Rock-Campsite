@@ -2121,7 +2121,8 @@
         totalBeers: null,
         visitors: null,
         byDay: {},
-        byHourToday: {}
+        byHourToday: {},
+        quotes: []
       },
       guestEntries: [],
       ten: null
@@ -2372,8 +2373,22 @@
       setText("memberBio", member.bio || "Bereit für das Festival.");
     }
 
+    function normalizeQuote(value) {
+      if (typeof value === "string") return clampText(value, 120);
+      if (value && typeof value === "object") return clampText(value.text || value.quote || "", 120);
+      return "";
+    }
+
     function getQuotes() {
-      return [...(CONFIG.quotes || []), ...storeGet("localQuotes", [])];
+      const staticQuotes = (CONFIG.quotes || []).map(normalizeQuote);
+      const remoteQuotes = (state.firebase.quotes || []).map(normalizeQuote);
+      const localQuotes = storeGet("localQuotes", []).map(normalizeQuote);
+      const seen = new Set();
+      return [...staticQuotes, ...remoteQuotes, ...localQuotes].filter(quote => {
+        if (!quote || seen.has(quote)) return false;
+        seen.add(quote);
+        return true;
+      });
     }
 
     function renderQuote() {
@@ -2434,6 +2449,35 @@
           input.focus();
           return;
         }
+        
+        if (state.firebase.ready) {
+          try {
+            const { ref, push, set, serverTimestamp } = state.firebase.api;
+            const quoteRef = push(ref(state.firebase.db, rootPath("quotes")));
+            await set(quoteRef, {
+              uid: state.firebase.uid,
+              text: quote,
+              createdAt: serverTimestamp()
+            });
+            state.firebase.quotes.push({
+              id: quoteRef.key,
+              text: quote,
+              uid: state.firebase.uid,
+              createdAt: Date.now()
+            });
+            input.value = "";
+            passwordInput.value = "";
+            byId("quoteForm").classList.add("hidden");
+            state.quoteIndex = getQuotes().length - 1;
+            renderQuote();
+            showToast("Zitat global gespeichert.");
+            return;
+          } catch (error) {
+            console.warn("Quote write failed", error);
+            showToast("Firebase hat das Zitat abgelehnt. Lokal gespeichert.");
+          }
+        }
+        
         const quotes = storeGet("localQuotes", []);
         quotes.push(quote);
         storeSet("localQuotes", quotes.slice(-40));
@@ -2442,7 +2486,7 @@
         byId("quoteForm").classList.add("hidden");
         state.quoteIndex = getQuotes().length - 1;
         renderQuote();
-        showToast("Zitat gespeichert.");
+        showToast("Zitat lokal gespeichert.");
       });
 
       byId("copyLocationBtn").addEventListener("click", async () => {
@@ -2755,6 +2799,22 @@
         snapshot.forEach(child => entries.push({ id: child.key, ...child.val() }));
         state.guestEntries = entries.sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
         renderGuestbook();
+              }));
+      const quoteQuery = query(ref(db, rootPath("quotes")), orderByChild("createdAt"), limitToLast(80));
+      state.firebase.listeners.push(onValue(quoteQuery, snapshot => {
+        const quotes = [];
+        snapshot.forEach(child => {
+          const value = child.val() || {};
+          const text = normalizeQuote(value);
+          if (text) quotes.push({
+            id: child.key,
+            text,
+            uid: value.uid || "",
+            createdAt: Number(value.createdAt || 0)
+          });
+        });
+        state.firebase.quotes = quotes.sort((a, b) => Number(a.createdAt || 0) - Number(b.createdAt || 0));
+        renderQuote();
       }));
     }
 
