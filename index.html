@@ -1,0 +1,3246 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#11071f">
+  <meta name="description" content="Nova Rock Camp Website mit Biertracker, Gästebuch, Stats und Minispielen.">
+  <title>Nova Rock Camp</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #090512;
+      --bg-2: #130a22;
+      --card: rgba(255, 255, 255, 0.075);
+      --card-strong: rgba(255, 255, 255, 0.12);
+      --text: #fff8f2;
+      --muted: rgba(255, 248, 242, 0.7);
+      --line: rgba(255, 255, 255, 0.16);
+      --hot: #ff4f8b;
+      --hot-2: #ffb703;
+      --cool: #24d6ff;
+      --ok: #52ffa8;
+      --bad: #ff6b6b;
+      --warn: #ffd166;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.36);
+      --radius-xl: 32px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --max: 1160px;
+      --nav-h: 74px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 5%, rgba(255, 79, 139, .36), transparent 32rem),
+        radial-gradient(circle at 80% 12%, rgba(36, 214, 255, .24), transparent 28rem),
+        radial-gradient(circle at 55% 95%, rgba(255, 183, 3, .16), transparent 32rem),
+        linear-gradient(135deg, var(--bg), var(--bg-2) 55%, #05030b);
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    body::before {
+      background-image:
+        radial-gradient(circle, rgba(255,255,255,.42) 1px, transparent 1.5px),
+        radial-gradient(circle, rgba(255,255,255,.28) 1px, transparent 1.5px);
+      background-size: 72px 72px, 118px 118px;
+      background-position: 0 0, 30px 48px;
+      opacity: .18;
+      animation: starDrift 38s linear infinite;
+    }
+
+    body::after {
+      background: linear-gradient(180deg, transparent 0%, rgba(9, 5, 18, .42) 100%);
+    }
+
+    @keyframes starDrift {
+      from { transform: translateY(0); }
+      to { transform: translateY(72px); }
+    }
+
+    a { color: inherit; }
+    button, input, textarea {
+      font: inherit;
+      color: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: .5;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: -999px;
+      top: 12px;
+      background: #fff;
+      color: #111;
+      padding: 10px 14px;
+      border-radius: 999px;
+      z-index: 100;
+    }
+
+    .skip-link:focus { left: 12px; }
+
+    .container {
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      backdrop-filter: blur(18px);
+      background: rgba(9, 5, 18, .72);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 14px 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--hot), var(--hot-2));
+      box-shadow: 0 12px 34px rgba(255, 79, 139, .28);
+      font-size: 1.35rem;
+      flex: none;
+    }
+
+    .brand small {
+      color: var(--muted);
+      display: block;
+      line-height: 1.1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .brand strong {
+      display: block;
+      font-size: .98rem;
+      line-height: 1.1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav a,
+    .pill,
+    .ghost-btn,
+    .primary-btn,
+    .danger-btn {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      border-radius: 999px;
+      padding: 10px 13px;
+      text-decoration: none;
+      color: var(--text);
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+    }
+
+    .nav a {
+      font-weight: 800;
+      font-size: .84rem;
+      color: var(--muted);
+    }
+
+    .nav a:hover,
+    .nav a.active,
+    .ghost-btn:hover {
+      color: var(--text);
+      background: rgba(255,255,255,.13);
+      border-color: rgba(255,255,255,.28);
+      transform: translateY(-1px);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .pill.good { color: var(--ok); border-color: rgba(82,255,168,.38); }
+    .pill.warn { color: var(--warn); border-color: rgba(255,209,102,.38); }
+    .pill.bad { color: var(--bad); border-color: rgba(255,107,107,.38); }
+
+    .hero {
+      padding: 64px 0 32px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .hero-card,
+    .card {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background: linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.055));
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card {
+      padding: clamp(26px, 5vw, 54px);
+      min-height: 430px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      background:
+        linear-gradient(135deg, rgba(255,79,139,.45), transparent 40%),
+        radial-gradient(circle at 80% 20%, rgba(36,214,255,.28), transparent 18rem);
+      z-index: 0;
+    }
+
+    .hero-card > * { position: relative; z-index: 1; }
+
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      color: var(--hot-2);
+      font-size: .78rem;
+      font-weight: 900;
+      margin: 0 0 12px;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      font-size: clamp(3.1rem, 9vw, 7.5rem);
+      line-height: .86;
+      letter-spacing: -.08em;
+      margin-bottom: 18px;
+      text-transform: uppercase;
+    }
+
+    h1 span,
+    .split-title span {
+      display: block;
+    }
+
+    h2 {
+      font-size: clamp(2.2rem, 6vw, 5.2rem);
+      line-height: .87;
+      letter-spacing: -.07em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    h3 {
+      font-size: 1.15rem;
+      margin-bottom: 10px;
+    }
+
+    .lead {
+      color: var(--muted);
+      font-size: clamp(1rem, 2vw, 1.24rem);
+      line-height: 1.65;
+      max-width: 68ch;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .primary-btn,
+    .danger-btn,
+    .ghost-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 44px;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, var(--hot), var(--hot-2));
+      color: #160710;
+      border: 0;
+      box-shadow: 0 16px 32px rgba(255, 79, 139, .25);
+    }
+
+    .danger-btn {
+      background: linear-gradient(135deg, #ff364d, #ff8d2b);
+      color: #160710;
+      border: 0;
+    }
+
+    .primary-btn:hover,
+    .danger-btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+
+    .hero-side {
+      display: grid;
+      gap: 16px;
+    }
+
+    .mini-stat {
+      padding: 22px;
+      min-height: 130px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .mini-stat strong {
+      font-size: clamp(2rem, 5vw, 3.6rem);
+      letter-spacing: -.06em;
+      line-height: .9;
+    }
+
+    .mini-stat span {
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    main {
+      padding: 18px 0 110px;
+    }
+
+    .section {
+      padding: 46px 0;
+      scroll-margin-top: calc(var(--nav-h) + 16px);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .section-head p {
+      color: var(--muted);
+      margin: 0;
+      max-width: 50ch;
+      line-height: 1.55;
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+    .card {
+      padding: 22px;
+      border-radius: var(--radius-lg);
+    }
+
+    .card.soft {
+      background: rgba(255,255,255,.055);
+      box-shadow: none;
+    }
+
+    .media-card {
+      padding: 0;
+      min-height: 310px;
+      display: grid;
+      grid-template-rows: 1fr auto;
+    }
+
+    .media-wrap {
+      position: relative;
+      min-height: 260px;
+      background: rgba(255,255,255,.05);
+      overflow: hidden;
+    }
+
+    .media-wrap img {
+      width: 100%;
+      height: 100%;
+      min-height: 260px;
+      object-fit: cover;
+      display: block;
+      filter: saturate(1.1) contrast(1.02);
+    }
+
+    .media-fallback {
+      display: grid;
+      place-items: center;
+      min-height: 260px;
+      padding: 28px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .media-caption {
+      padding: 16px 18px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      line-height: 1.5;
+    }
+
+    .member-card {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .avatar {
+      width: 140px;
+      height: 140px;
+      border-radius: 30px;
+      background: linear-gradient(135deg, rgba(255,79,139,.35), rgba(36,214,255,.2));
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      font-size: 3rem;
+      border: 1px solid var(--line);
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .member-meta {
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .member-controls,
+    .row-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .kv {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px 14px;
+      align-items: center;
+      color: var(--muted);
+    }
+
+    .kv strong {
+      color: var(--text);
+      text-align: right;
+    }
+
+    .setup-box {
+      border: 1px solid rgba(255, 209, 102, .45);
+      background: rgba(255, 209, 102, .09);
+      color: #fff3c4;
+    }
+
+    .setup-box code,
+    code {
+      background: rgba(255,255,255,.1);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: .1rem .35rem;
+      color: #fff;
+    }
+
+    .hidden { display: none !important; }
+
+    .big-number {
+      font-size: clamp(3.2rem, 8vw, 6rem);
+      line-height: .9;
+      letter-spacing: -.08em;
+      font-weight: 950;
+      margin: 8px 0;
+    }
+
+    .beer-button {
+      width: min(100%, 420px);
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+      margin: 10px auto;
+      display: grid;
+      place-items: center;
+      font-size: clamp(2rem, 8vw, 4.8rem);
+      line-height: .9;
+      letter-spacing: -.05em;
+      color: #160710;
+      background:
+        radial-gradient(circle at 35% 25%, rgba(255,255,255,.75), transparent 26%),
+        linear-gradient(135deg, var(--hot-2), var(--hot));
+      box-shadow:
+        0 22px 64px rgba(255,79,139,.28),
+        inset 0 -16px 0 rgba(0,0,0,.12);
+      border: 10px solid rgba(255,255,255,.16);
+      text-transform: uppercase;
+      font-weight: 950;
+      transform: translateZ(0);
+    }
+
+    .beer-button:active:not(:disabled) {
+      transform: scale(.98);
+    }
+
+    .status-text {
+      min-height: 26px;
+      color: var(--muted);
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: var(--radius-md);
+    }
+
+    .table th,
+    .table td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      color: var(--muted);
+    }
+
+    .table th {
+      color: var(--text);
+      font-size: .82rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .table td:last-child,
+    .table th:last-child {
+      text-align: right;
+    }
+
+    .empty {
+      color: var(--muted);
+      padding: 18px;
+      text-align: center;
+      border: 1px dashed var(--line);
+      border-radius: var(--radius-md);
+    }
+
+    .chart {
+      display: grid;
+      gap: 12px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 92px 1fr 54px;
+      gap: 12px;
+      align-items: center;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .bar-track {
+      min-height: 18px;
+      background: rgba(255,255,255,.08);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .bar-fill {
+      height: 100%;
+      min-width: 3px;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--cool), var(--hot));
+    }
+
+    .game-output {
+      min-height: 82px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.055);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 16px;
+      color: var(--muted);
+      line-height: 1.45;
+      font-weight: 800;
+    }
+
+
+    .kc-area {
+      display: grid;
+      gap: 12px;
+      justify-items: center;
+      margin: 10px 0 14px;
+    }
+
+    .kc-deck {
+      width: 150px;
+      height: 206px;
+      display: grid;
+      place-items: center;
+      perspective: 900px;
+      position: relative;
+    }
+
+    .kc-deck::before,
+    .kc-deck::after {
+      content: "";
+      position: absolute;
+      width: 122px;
+      height: 176px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(255,255,255,.11), rgba(255,255,255,.04));
+      border: 1px solid var(--line);
+      transform: rotate(-7deg) translate(-7px, 6px);
+      opacity: .58;
+    }
+
+    .kc-deck::after {
+      transform: rotate(6deg) translate(7px, 3px);
+      opacity: .4;
+    }
+
+    .kc-card {
+      width: 126px;
+      height: 182px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform .65s cubic-bezier(.2,.8,.2,1);
+      z-index: 1;
+    }
+
+    .kc-card.flipped { transform: rotateY(180deg); }
+
+    .kc-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      backface-visibility: hidden;
+      overflow: hidden;
+      border: 2px solid rgba(255,255,255,.72);
+      box-shadow: 0 22px 40px rgba(0,0,0,.28);
+    }
+
+    .kc-back {
+      display: grid;
+      place-items: center;
+      color: var(--hot-2);
+      font-size: 2.6rem;
+      background:
+        linear-gradient(45deg, rgba(255,255,255,.08) 25%, transparent 25%, transparent 75%, rgba(255,255,255,.08) 75%),
+        linear-gradient(45deg, rgba(255,255,255,.08) 25%, transparent 25%, transparent 75%, rgba(255,255,255,.08) 75%),
+        linear-gradient(135deg, #2b1135, #0d1024);
+      background-size: 24px 24px;
+      background-position: 0 0, 12px 12px, 0 0;
+    }
+
+    .kc-front {
+      transform: rotateY(180deg);
+      background: linear-gradient(160deg, #fffaf1, #f2dec3);
+      color: #171018;
+      display: grid;
+      place-items: center;
+      padding: 12px;
+    }
+
+    .kc-front.red { color: #bd1734; }
+
+    .kc-rank {
+      font-size: 3.25rem;
+      font-weight: 950;
+      line-height: 1;
+      letter-spacing: -.06em;
+    }
+
+    .kc-suit-big {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 4.2rem;
+      opacity: .16;
+    }
+
+    .kc-corner {
+      position: absolute;
+      font-weight: 950;
+      font-size: 1.1rem;
+      line-height: 1;
+      display: grid;
+      gap: 1px;
+      text-align: center;
+      white-space: pre-line;
+    }
+
+    .kc-corner-top { top: 12px; left: 10px; }
+    .kc-corner-bottom { right: 10px; bottom: 12px; transform: rotate(180deg); }
+
+    .kc-rule {
+      width: 100%;
+      min-height: 76px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.055);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 14px;
+      color: var(--text);
+      font-weight: 900;
+      line-height: 1.42;
+    }
+
+    .kc-meta {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: .82rem;
+      font-weight: 900;
+    }
+
+    .kc-meta span,
+    .kc-chip {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      border-radius: 999px;
+      padding: 6px 10px;
+    }
+
+    .kc-drawn-chips {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-height: 31px;
+    }
+
+    .kc-chip {
+      color: var(--muted);
+      font-weight: 950;
+      font-size: .78rem;
+    }
+
+    .kc-chip.red { color: #ff9aaf; }
+    .kc-chip.king { color: var(--hot-2); border-color: rgba(255,183,3,.5); background: rgba(255,183,3,.08); }
+
+    .ten-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .ten-metric {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.055);
+      border-radius: 15px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .ten-metric span {
+      display: block;
+      color: var(--muted);
+      font-size: .76rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .ten-metric strong {
+      display: block;
+      margin-top: 2px;
+      font-size: 1.28rem;
+    }
+
+    .ten-dice {
+      justify-content: center;
+      min-height: 72px;
+    }
+
+    .die.ten-die {
+      cursor: pointer;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease, opacity .12s ease;
+    }
+
+    .die.ten-die:hover:not(:disabled) { transform: translateY(-2px); }
+
+    .die.ten-die.selected {
+      background: linear-gradient(135deg, var(--ok), var(--cool));
+      color: #130716;
+      border-color: transparent;
+      transform: translateY(-4px);
+      box-shadow: 0 12px 28px rgba(36,214,255,.18);
+    }
+
+    .die.ten-die:disabled {
+      opacity: .42;
+      cursor: not-allowed;
+    }
+
+    .ten-kept {
+      min-height: 28px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: .84rem;
+      margin-bottom: 10px;
+    }
+
+    .ten-kept .mini-die {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 4px 7px;
+      background: rgba(255,255,255,.06);
+      font-weight: 950;
+    }
+
+    .ten-kept .hot {
+      color: var(--hot-2);
+      border-color: rgba(255,183,3,.5);
+    }
+
+    .coin {
+      width: 92px;
+      height: 92px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 14px;
+      background: radial-gradient(circle at 35% 25%, #fff8c7, #ffb703 45%, #a36100);
+      color: #3b2100;
+      font-size: 2.2rem;
+      font-weight: 950;
+      box-shadow: inset 0 -8px rgba(0,0,0,.18), 0 16px 38px rgba(255,183,3,.18);
+    }
+
+    .coin.spin {
+      animation: flip .72s cubic-bezier(.2,.8,.2,1);
+    }
+
+    @keyframes flip {
+      0% { transform: rotateY(0) scale(1); }
+      45% { transform: rotateY(1080deg) scale(1.1); }
+      100% { transform: rotateY(1440deg) scale(1); }
+    }
+
+    .slot {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .slot span,
+    .die {
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: rgba(255,255,255,.1);
+      border: 1px solid var(--line);
+      font-size: 2rem;
+      font-weight: 950;
+    }
+
+    .form {
+      display: grid;
+      gap: 10px;
+    }
+
+    .form label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-weight: 800;
+      font-size: .9rem;
+    }
+
+    .input,
+    .textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,.18);
+      border-radius: 14px;
+      padding: 12px 13px;
+      outline: none;
+    }
+
+    .textarea {
+      min-height: 112px;
+      resize: vertical;
+    }
+
+    .input:focus,
+    .textarea:focus {
+      border-color: rgba(36,214,255,.65);
+      box-shadow: 0 0 0 4px rgba(36,214,255,.12);
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.08);
+      border-radius: 999px;
+      padding: 9px 12px;
+      color: var(--muted);
+      font-weight: 900;
+    }
+
+    .chip.active {
+      color: #150710;
+      background: linear-gradient(135deg, var(--ok), var(--cool));
+      border-color: transparent;
+    }
+
+    .chip.off {
+      opacity: .45;
+      text-decoration: line-through;
+    }
+
+    .bingo-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+
+    .bingo-head,
+    .bingo-cell {
+      min-height: 64px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 8px;
+      font-weight: 950;
+    }
+
+    .bingo-head {
+      min-height: 38px;
+      color: #150710;
+      background: linear-gradient(135deg, var(--hot-2), var(--cool));
+      font-size: 1.2rem;
+    }
+
+    .bingo-cell {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.075);
+      color: var(--muted);
+      line-height: 1.15;
+      font-size: clamp(.72rem, 1.7vw, .92rem);
+    }
+
+    .bingo-cell.checked {
+      color: #120710;
+      background: linear-gradient(135deg, var(--ok), var(--hot-2));
+      border-color: transparent;
+      transform: rotate(-1deg);
+    }
+
+    .guest-list,
+    .achievement-grid,
+    .history-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .guest-entry,
+    .achievement,
+    .history-item {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      border-radius: var(--radius-md);
+      padding: 14px;
+    }
+
+    .guest-entry strong,
+    .achievement strong,
+    .history-item strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .guest-entry p,
+    .achievement p,
+    .history-item p {
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.45;
+    }
+
+    .achievement {
+      opacity: .58;
+    }
+
+    .achievement.unlocked {
+      opacity: 1;
+      border-color: rgba(82,255,168,.42);
+      background: rgba(82,255,168,.08);
+    }
+
+    .dice-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 14px 0;
+    }
+
+    .die {
+      user-select: none;
+      font-size: 1.6rem;
+    }
+
+    .player-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-weight: 900;
+    }
+
+    .player-row.active {
+      color: var(--text);
+    }
+
+    .bottom-nav {
+      position: fixed;
+      z-index: 45;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+      background: rgba(9,5,18,.84);
+      border-top: 1px solid var(--line);
+      backdrop-filter: blur(18px);
+      display: none;
+    }
+
+    .bottom-nav-inner {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .bottom-nav a {
+      color: var(--muted);
+      text-decoration: none;
+      border-radius: 16px;
+      padding: 8px 4px;
+      text-align: center;
+      font-size: .74rem;
+      font-weight: 900;
+      display: grid;
+      gap: 2px;
+    }
+
+    .bottom-nav a.active {
+      background: rgba(255,255,255,.1);
+      color: var(--text);
+    }
+
+    .bottom-nav span:first-child {
+      font-size: 1.1rem;
+    }
+
+    .toast {
+      position: fixed;
+      z-index: 60;
+      left: 50%;
+      bottom: calc(84px + env(safe-area-inset-bottom));
+      transform: translateX(-50%) translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      max-width: min(440px, calc(100% - 28px));
+      border-radius: 999px;
+      padding: 13px 18px;
+      background: rgba(255,255,255,.94);
+      color: #150710;
+      font-weight: 950;
+      box-shadow: var(--shadow);
+      transition: opacity .18s ease, transform .18s ease;
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .small {
+      font-size: .88rem;
+      line-height: 1.5;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 960px) {
+      .hero-grid,
+      .grid.two,
+      .grid.three,
+      .grid.four {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar .nav {
+        display: none;
+      }
+
+      .bottom-nav {
+        display: block;
+      }
+
+      .section-head {
+        display: block;
+      }
+
+      .section-head p {
+        margin-top: -6px;
+      }
+
+      .member-card {
+        grid-template-columns: 1fr;
+      }
+
+      .avatar {
+        width: 100%;
+        height: 240px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .container {
+        width: min(100% - 22px, var(--max));
+      }
+
+      .hero {
+        padding-top: 38px;
+      }
+
+      .hero-card,
+      .card {
+        border-radius: 24px;
+      }
+
+      .card {
+        padding: 18px;
+      }
+
+      .bar-row {
+        grid-template-columns: 72px 1fr 42px;
+        font-size: .85rem;
+      }
+
+      .bingo-grid {
+        gap: 6px;
+      }
+
+      .bingo-cell {
+        min-height: 58px;
+        padding: 5px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: .001ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Zum Inhalt springen</a>
+
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div class="brand" aria-label="Seitenkopf">
+        <div class="brand-mark" aria-hidden="true">🤘</div>
+        <div>
+          <small id="topFestival">Nova Rock 2026</small>
+          <strong id="topCampName">Nova Rock Camp</strong>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Hauptnavigation">
+        <a href="#camp">Camp</a>
+        <a href="#beer">Bier</a>
+        <a href="#stats">Stats</a>
+        <a href="#games">Spiele</a>
+        <a href="#guestbook">Gästebuch</a>
+        <a href="#ten-thousand">10.000</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container hero">
+    <div id="setupBox" class="card setup-box hidden" role="status">
+      <h3>Firebase ist noch nicht konfiguriert</h3>
+      <p class="small">Die Seite läuft vollständig lokal. Für globale Bier-Zähler, Besucher und Gästebuch trage in der Konfiguration unten in der <code>index.html</code> deine echte Firebase-Web-App-Config ein, aktiviere Anonymous Auth und importiere die Datei <code>firebase-rules.json</code>.</p>
+    </div>
+
+    <div class="hero-grid">
+      <section class="hero-card" aria-labelledby="heroTitle">
+        <p class="eyebrow" id="heroFestival">Nova Rock 2026</p>
+        <h1 id="heroTitle"><span>Nova</span><span>Rock</span><span>Camp</span></h1>
+        <p class="lead" id="heroDescription">Das beste Camp auf dem gesamten Gelände. Natürlich.</p>
+        <div class="hero-actions">
+          <a class="primary-btn" href="#beer">🍺 Bier tracken</a>
+          <a class="ghost-btn" href="#camp">📍 Standort</a>
+          <span class="pill" id="firebasePill">⚪ Lokalmodus</span>
+        </div>
+      </section>
+
+      <aside class="hero-side" aria-label="Camp Status">
+        <div class="card mini-stat">
+          <span>Festival läuft in</span>
+          <strong id="countdown">–</strong>
+          <small class="muted" id="dateRange">11.06.–14.06.2026</small>
+        </div>
+        <div class="card mini-stat">
+          <span>Globale Biere</span>
+          <strong id="heroGlobalBeers">0</strong>
+          <small class="muted">Realtime, wenn Firebase aktiv ist</small>
+        </div>
+        <div class="card mini-stat">
+          <span>Besucher</span>
+          <strong id="heroVisitors">–</strong>
+          <small class="muted">einmalig pro anonymem Firebase-User</small>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <main id="main">
+    <section class="section" id="camp" data-section>
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Zuhause auf Zeit</p>
+            <h2 class="split-title"><span>Unser</span><span>Camp</span></h2>
+          </div>
+          <p id="campIntro">Foto, Standort, Crew und Playlist an einem Ort.</p>
+        </div>
+
+        <div class="grid two">
+          <article class="card media-card">
+            <div class="media-wrap" id="campImageWrap">
+              <img id="campImage" alt="Camp Foto" loading="lazy">
+            </div>
+            <div class="media-caption" id="campImageCaption">Camp-Foto aus dem Ordner fotos/.</div>
+          </article>
+
+          <article class="card">
+            <h3>📍 Standort</h3>
+            <p class="lead small">Nutzt das Kartenbild und optional exakte Koordinaten. Keine Fake-Koordinaten mehr: Wenn nichts gesetzt ist, zeigt die Seite sauber „wird ergänzt“.</p>
+            <div class="kv" aria-live="polite">
+              <span>Breitengrad</span><strong id="latText">wird ergänzt</strong>
+              <span>Längengrad</span><strong id="lngText">wird ergänzt</strong>
+              <span>Kartenstatus</span><strong id="mapStatus">Bild vorhanden</strong>
+            </div>
+            <div class="row-actions">
+              <a id="mapsLink" class="primary-btn hidden" target="_blank" rel="noopener noreferrer">🗺️ In Maps öffnen</a>
+              <button class="ghost-btn" type="button" id="copyLocationBtn">📋 Standort kopieren</button>
+            </div>
+          </article>
+        </div>
+
+        <div class="grid two" style="margin-top:18px">
+          <article class="card media-card">
+            <div class="media-wrap" id="mapImageWrap">
+              <img id="mapImage" alt="Camp Standort Karte" loading="lazy">
+            </div>
+            <div class="media-caption">Standortbild: <code>fotos/Standort.png</code></div>
+          </article>
+
+          <article class="card">
+            <h3>👥 Die Crew</h3>
+            <div class="member-card">
+              <div class="avatar" id="memberAvatar" aria-hidden="true">🤘</div>
+              <div>
+                <h3 id="memberName">Crew</h3>
+                <p class="pill" id="memberRole">Campmitglied</p>
+                <p class="member-meta" id="memberBio">Bereit für das Festival.</p>
+                <div class="member-controls">
+                  <button class="ghost-btn" type="button" id="memberPrev">← Zurück</button>
+                  <button class="ghost-btn" type="button" id="memberNext">Weiter →</button>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="grid two" style="margin-top:18px">
+          <article class="card">
+            <h3>🎵 Camp-Playlist</h3>
+            <div id="spotifyMount" class="media-fallback">Playlist-ID in der Konfiguration setzen.</div>
+          </article>
+
+          <article class="card">
+            <h3>💬 Camp-Zitat</h3>
+            <div class="game-output" id="quoteOutput">Noch kein Zitat.</div>
+            <div class="row-actions">
+              <button class="ghost-btn" type="button" id="quotePrev">←</button>
+              <button class="ghost-btn" type="button" id="quoteNext">→</button>
+              <button class="ghost-btn" type="button" id="quoteFormToggle">+ Zitat hinzufügen</button>
+            </div>
+            <form class="form hidden" id="quoteForm">
+              <label>Passwort
+                <input class="input" id="quotePasswordInput" type="password" maxlength="32" autocomplete="off" placeholder="Camp-Passwort">
+              </label>
+              <label>Zitat
+                <input class="input" id="quoteInput" maxlength="120" placeholder="Was wurde gesagt?">
+              </label>
+              <button class="primary-btn" type="submit">Zitat speichern</button>
+            </form>
+            <p class="small muted">Neue Zitate können nur mit dem Camp-Passwort hinzugefügt werden. Hinweis: Bei einer statischen Website ist das ein einfacher Camp-Schutz, keine echte Admin-Sicherheit.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="beer" data-section>
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Für die wichtigen Dinge</p>
+            <h2 class="split-title"><span>Bier</span><span>Tracker</span></h2>
+          </div>
+          <p>Lokale Zähler funktionieren sofort. Globale Zähler laufen über Firebase mit Anonymous Auth und validierten Security Rules.</p>
+        </div>
+
+        <div class="grid two">
+          <article class="card" style="text-align:center">
+            <p class="pill">Deine heutigen Biere</p>
+            <div class="big-number" id="todayLocalBeers">0</div>
+            <button class="beer-button" type="button" id="beerButton" aria-describedby="beerStatus"><span>+1<br>Bier</span></button>
+            <div class="status-text" id="beerStatus" aria-live="polite">Bereit!</div>
+          </article>
+
+          <article class="card">
+            <h3>Aktuelle Zähler</h3>
+            <div class="grid two">
+              <div class="card soft">
+                <span class="muted">Deine Festival-Bilanz</span>
+                <div class="big-number" id="localTotalBeers">0</div>
+              </div>
+              <div class="card soft">
+                <span class="muted">Alle zusammen</span>
+                <div class="big-number" id="globalTotalBeers">0</div>
+              </div>
+            </div>
+            <h3 style="margin-top:18px">Deine Tage</h3>
+            <table class="table">
+              <thead><tr><th>Tag</th><th>Biere</th></tr></thead>
+              <tbody id="localBeerTable"><tr><td colspan="2">Noch keine Daten</td></tr></tbody>
+            </table>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="stats" data-section>
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Was bisher geschah</p>
+            <h2 class="split-title"><span>Bier</span><span>Stats</span></h2>
+          </div>
+          <p>Keine externen Chart-Abhängigkeiten, keine kaputten Canvas-Plugins: einfache robuste CSS-Balken.</p>
+        </div>
+
+        <div class="grid two">
+          <article class="card">
+            <h3>🍻 Biere pro Tag</h3>
+            <div class="chart" id="dayChart"></div>
+          </article>
+          <article class="card">
+            <h3>⏰ Aktivste Stunden heute</h3>
+            <div class="chart" id="hourChart"></div>
+          </article>
+        </div>
+
+        <article class="card" style="margin-top:18px">
+          <h3>📋 Tagesübersicht</h3>
+          <table class="table">
+            <thead><tr><th>Tag</th><th>Globale Biere</th><th>Aktivste Stunde</th></tr></thead>
+            <tbody id="globalStatsTable"><tr><td colspan="3">Noch keine Daten</td></tr></tbody>
+          </table>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="games" data-section>
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Wenn die Langeweile droht</p>
+            <h2 class="split-title"><span>Mini</span><span>Spiele</span></h2>
+          </div>
+          <p>Alles lokal, schnell und offline-fähig.</p>
+        </div>
+
+        <div class="grid three">
+          <article class="card">
+            <h3>🪙 Münzwurf</h3>
+            <div class="coin" id="coinFace">?</div>
+            <div class="game-output" id="coinResult">Drücke den Knopf!</div>
+            <button class="primary-btn" type="button" id="coinBtn">Münze werfen</button>
+          </article>
+
+          <article class="card">
+            <h3>🎲 Zufalls-Aufgabe</h3>
+            <div class="game-output" id="taskOutput">Bereit für eine Aufgabe?</div>
+            <button class="primary-btn" type="button" id="taskBtn">Aufgabe auswürfeln</button>
+            <div class="history-list" id="taskHistory" style="margin-top:12px"></div>
+          </article>
+
+          <article class="card">
+            <h3>🎰 Slot Machine</h3>
+            <div class="slot" id="slotReels"><span>🍺</span><span>⭐</span><span>🤘</span></div>
+            <div class="game-output" id="slotResult">Drei gleiche = du bestimmst eine Regel.</div>
+            <button class="primary-btn" type="button" id="slotBtn">Drehen!</button>
+          </article>
+        </div>
+
+        <div class="grid three" style="margin-top:18px">
+          <article class="card">
+            <h3>👑 Kings Cup</h3>
+            <p class="small muted">Echtes 52er-Deck mit sichtbaren Karten, Ziehstapel, Regelanzeige und König-Zähler.</p>
+            <div class="kc-area">
+              <div class="kc-deck" aria-live="polite">
+                <div class="kc-card" id="kingCardVisual" aria-label="Kings-Cup-Karte">
+                  <div class="kc-face kc-back">★</div>
+                  <div class="kc-face kc-front" id="kingCardFront">
+                    <span class="kc-corner kc-corner-top" id="kingCornerTop">?</span>
+                    <span class="kc-suit-big" id="kingSuitBig">?</span>
+                    <span class="kc-rank" id="kingRank">?</span>
+                    <span class="kc-corner kc-corner-bottom" id="kingCornerBottom">?</span>
+                  </div>
+                </div>
+              </div>
+              <div class="kc-rule" id="kingRule">Drücke auf „Karte ziehen“.</div>
+              <div class="kc-meta">
+                <span id="kingDeckCount">52 Karten übrig</span>
+                <span id="kingCount">0/4 Könige</span>
+              </div>
+              <div class="kc-drawn-chips" id="kingDrawnChips" aria-label="Gezogene Karten"></div>
+            </div>
+            <div class="row-actions">
+              <button class="primary-btn" type="button" id="kingDrawBtn">Karte ziehen</button>
+              <button class="ghost-btn" type="button" id="kingResetBtn">↺ Neues Spiel</button>
+            </div>
+          </article>
+
+          <article class="card">
+            <h3>⚖️ Wer muss trinken?</h3>
+            <form class="form" id="drinkPlayerForm">
+              <label>Name hinzufügen
+                <input class="input" id="drinkPlayerInput" maxlength="24" placeholder="Name">
+              </label>
+            </form>
+            <div class="chips" id="drinkPlayers"></div>
+            <div class="game-output" id="drinkResult">Tippe auf Namen zum Ausschließen.</div>
+            <button class="primary-btn" type="button" id="drinkPickBtn">Los! Wer trinkt?</button>
+          </article>
+
+          <article class="card" id="shell" data-section>
+            <h3>🐚 Magische Miesmuschel</h3>
+            <form class="form" id="shellForm">
+              <label>Deine Frage
+                <input class="input" id="shellQuestion" maxlength="80" placeholder="Soll ich noch eins trinken?">
+              </label>
+              <button class="primary-btn" type="submit">Befragen</button>
+            </form>
+            <div class="game-output" id="shellAnswer" style="margin-top:12px">Die Muschel wartet.</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="bingo" data-section>
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Wer zuerst ruft, gewinnt</p>
+            <h2 class="split-title"><span>Festival</span><span>Bingo</span></h2>
+          </div>
+          <p>Tippe auf ein Feld, wenn du es erlebt hast. Der Fortschritt bleibt lokal gespeichert.</p>
+        </div>
+
+        <article class="card">
+          <div class="bingo-grid" id="bingoGrid" aria-label="Festival Bingo"></div>
+          <div class="row-actions">
+            <button class="primary-btn" type="button" id="bingoNewBtn">Neue Karte</button>
+            <span class="pill" id="bingoStatus">Noch kein Bingo</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="guestbook" data-section>
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Hinterlasse dein Zeichen</p>
+            <h2 class="split-title"><span>Gäste</span><span>Buch</span></h2>
+          </div>
+          <p>Benutzereingaben werden nicht per <code>innerHTML</code> gerendert. Firebase-Rules begrenzen Länge und Struktur.</p>
+        </div>
+
+        <div class="grid two">
+          <article class="card">
+            <h3>✉️ Eintragen</h3>
+            <form class="form" id="guestForm">
+              <label>Name
+                <input class="input" id="guestName" maxlength="32" autocomplete="name" required placeholder="Dein Name">
+              </label>
+              <label>Nachricht
+                <textarea class="textarea" id="guestMessage" maxlength="240" required placeholder="Grüße ans Camp!"></textarea>
+              </label>
+              <button class="primary-btn" type="submit">Eintragen</button>
+              <p class="small muted" id="guestHint">Im Lokalmodus wird dein Eintrag nur auf diesem Gerät gespeichert.</p>
+            </form>
+          </article>
+
+          <article class="card">
+            <h3>Letzte Einträge</h3>
+            <div class="guest-list" id="guestList">
+              <div class="empty">Noch keine Einträge.</div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="ten-thousand" data-section>
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Erste Person auf 10.000 gewinnt</p>
+            <h2 class="split-title"><span>Zehn</span><span>Tausend</span></h2>
+          </div>
+          <p>Jetzt wieder wie ein richtiges 10.000-Spiel: würfeln, wertende Würfel antippen, Auswahl behalten, Risiko nehmen oder Punkte kassieren.</p>
+        </div>
+
+        <div class="grid two">
+          <article class="card">
+            <h3>Spieler wählen</h3>
+            <div class="chips" id="tenPlayerChips"></div>
+            <div class="row-actions">
+              <button class="primary-btn" type="button" id="tenStartBtn">Spiel starten</button>
+              <button class="ghost-btn" type="button" id="tenResetBtn">Neues Spiel</button>
+            </div>
+            <p class="small muted">Mindestens 350 Punkte zum Einsteigen · 1er = 100 · 5er = 50 · Drillinge · Straße · 3 Paare · Hot-Dice/Bestätigungswurf.</p>
+          </article>
+
+          <article class="card">
+            <h3 id="tenTurnTitle">Noch kein Spiel</h3>
+            <div class="ten-metrics" aria-live="polite">
+              <div class="ten-metric"><span>Zug</span><strong id="tenTurnScore">0</strong></div>
+              <div class="ten-metric"><span>Auswahl</span><strong id="tenSelectionScore">0</strong></div>
+              <div class="ten-metric"><span>Würfel</span><strong id="tenActiveDice">6</strong></div>
+            </div>
+            <div class="dice-row ten-dice" id="tenDice" aria-label="Aktueller Wurf"></div>
+            <div class="ten-kept" id="tenKept"></div>
+            <div class="game-output" id="tenStatus">Wähle mindestens zwei Spieler.</div>
+            <div class="row-actions">
+              <button class="primary-btn" type="button" id="tenRollBtn" disabled>Würfeln</button>
+              <button class="ghost-btn" type="button" id="tenHoldBtn" disabled>Auswahl behalten</button>
+              <button class="ghost-btn" type="button" id="tenBankBtn" disabled>Punkte kassieren</button>
+            </div>
+          </article>
+        </div>
+
+        <div class="grid two" style="margin-top:18px">
+          <article class="card">
+            <h3>Scoreboard</h3>
+            <div id="tenScoreboard"></div>
+          </article>
+          <article class="card">
+            <h3>Verlauf</h3>
+            <div class="history-list" id="tenHistory"><div class="empty">Noch kein Verlauf.</div></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="badges" data-section>
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Wirst du alle freischalten?</p>
+            <h2 class="split-title"><span>Achieve</span><span>ments</span></h2>
+          </div>
+          <p>Badges sind lokale Spaß-Erfolge und speichern keine privaten Daten online.</p>
+        </div>
+
+        <div class="achievement-grid grid three" id="achievementGrid"></div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Mobile Navigation">
+    <div class="bottom-nav-inner">
+      <a href="#camp"><span>🏕️</span><span>Camp</span></a>
+      <a href="#beer"><span>🍺</span><span>Bier</span></a>
+      <a href="#games"><span>🎲</span><span>Spiele</span></a>
+      <a href="#guestbook"><span>✍️</span><span>Gäste</span></a>
+      <a href="#ten-thousand"><span>🎯</span><span>10k</span></a>
+    </div>
+  </nav>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    window.NOVA_ROCK_CONFIG = {
+      campName: "Nova Rock Camp",
+      festivalLabel: "Nova Rock 2026",
+      festivalDays: ["2026-06-11", "2026-06-12", "2026-06-13", "2026-06-14"],
+      description: "Das beste Camp auf dem gesamten Gelände. Natürlich. Bier kalt, Musik laut, Stimmung stabil.",
+      campImageUrl: "fotos/camp.jpg",
+      mapImageUrl: "fotos/Standort.png",
+      coordinates: {
+        lat: null,
+        lng: null
+      },
+      spotifyPlaylistId: "2OH5uA1XF39Ehe2Zzl1cet",
+      cooldownSec: 30,
+      quotePassword: "NR26",
+      firebase: {
+        enabled: true,
+        sdkVersion: "12.14.0",
+        rootPath: "novaRockCamp/v2",
+        config: {
+          apiKey: "DEINE_API_KEY",
+          authDomain: "DEIN_PROJEKT.firebaseapp.com",
+          databaseURL: "https://DEIN_PROJEKT-default-rtdb.europe-west1.firebasedatabase.app",
+          projectId: "DEIN_PROJEKT",
+          appId: "DEINE_APP_ID"
+        }
+      },
+      members: [
+        {
+          name: "Andreas",
+          role: "Camp-Captain",
+          bio: "Hat immer einen Plan, meistens auch Kabelbinder.",
+          emoji: "🦊",
+          image: "fotos/Andreas.jpg"
+        },
+        {
+          name: "Michael",
+          role: "Sound & Stimmung",
+          bio: "Playlist an, Alltag aus.",
+          emoji: "🎸",
+          image: "fotos/Michael.jpg"
+        },
+        {
+          name: "Sophie",
+          role: "Chaos-Management",
+          bio: "Findet alles wieder, was andere verlieren.",
+          emoji: "✨",
+          image: "fotos/Sophie.jpg"
+        },
+        {
+          name: "Thomas",
+          role: "Logistik",
+          bio: "Kann einen Pavillon mit Blicken stabilisieren.",
+          emoji: "🧰",
+          image: "fotos/Thomas.jpg"
+        }
+      ],
+      quotes: [
+        "Nur kurz hinlegen.",
+        "Das ist kein Müll, das ist Camp-Deko.",
+        "Wer hat den Dosenöffner?",
+        "Wir gehen wirklich früh schlafen. Ganz sicher."
+      ],
+      tasks: [
+        "Mach ein Gruppenfoto mit der Crew.",
+        "Bring jemandem ein Wasser.",
+        "Erfinde einen neuen Camp-Schlachtruf.",
+        "Tausche ein Kompliment gegen einen High Five.",
+        "Räume fünf Dinge auf, die nicht dir gehören.",
+        "Singe den Refrain vom letzten Song.",
+        "Finde jemanden mit demselben Lieblingsact.",
+        "Mach zehn Kniebeugen. Oder trink ein Wasser.",
+        "Bestimme die nächste Camp-Regel für 15 Minuten.",
+        "Frag die Runde nach dem Festival-Highlight des Tages."
+      ],
+      bingoItems: [
+        "Jemand sagt: nur ein Bier", "Powerbank leer", "Falscher Eingang", "Bandshirt-Zwilling",
+        "Dosenbier-Frühstück", "Glitzer im Gesicht", "Luftmatratze verliert Luft", "Regenponcho gesichtet",
+        "Handy auf 1%", "Song komplett mitgesungen", "Neue Campfreunde", "Pavillon wackelt",
+        "Jemand sucht Schlüssel", "Schuhe voller Staub", "Crowdsurfer gesehen", "Essen schmeckt um 3 Uhr",
+        "Sonnencreme vergessen", "Campstuhl bricht fast", "Wasser-Runde gemacht", "Security winkt freundlich",
+        "Moshpit-Erzählung", "Ohrwurm seit Stunden", "Jemand macht Powernap", "Festivalbändchen bewundert",
+        "Fremdes Camp besucht", "Sternenhimmel-Moment", "Setlist-Diskussion", "Zu laut geredet"
+      ]
+    };
+  </script>
+
+  <script type="module">
+    const CONFIG = window.NOVA_ROCK_CONFIG;
+    const STORE_PREFIX = "nova-rock-camp:v2:";
+
+    const state = {
+      memberIndex: 0,
+      quoteIndex: 0,
+      firebase: {
+        ready: false,
+        uid: null,
+        db: null,
+        api: null,
+        listeners: [],
+        totalBeers: null,
+        visitors: null,
+        byDay: {},
+        byHourToday: {}
+      },
+      guestEntries: [],
+      ten: null
+    };
+
+    const ACHIEVEMENTS = [
+      { id: "first_beer", icon: "🍺", title: "Angezapft", desc: "Tracke dein erstes Bier." },
+      { id: "five_today", icon: "🔥", title: "Tagesform", desc: "Fünf Biere an einem Tag getrackt." },
+      { id: "ten_total", icon: "🏆", title: "Zweistellig", desc: "Zehn Biere über das Festival verteilt." },
+      { id: "guestbook", icon: "✍️", title: "Verewigt", desc: "Einen Gästebuch-Eintrag erstellt." },
+      { id: "bingo", icon: "✅", title: "Bingo!", desc: "Eine vollständige Reihe abgeschlossen." },
+      { id: "coin", icon: "🪙", title: "Schicksal akzeptiert", desc: "Eine Münze geworfen." },
+      { id: "task", icon: "🎲", title: "Aufgabe angenommen", desc: "Eine Zufalls-Aufgabe gezogen." },
+      { id: "ten_win", icon: "🎯", title: "10.000er Legende", desc: "Eine Runde Zehntausend gewonnen." }
+    ];
+
+    const KING_RULES = {
+      A: "Waterfall: Alle trinken, du startest.",
+      2: "You: Such eine Person aus.",
+      3: "Me: Du trinkst.",
+      4: "Floor: Letzte Person am Boden trinkt.",
+      5: "Guys: Männer trinken.",
+      6: "Chicks: Frauen trinken.",
+      7: "Heaven: Letzte Hand oben trinkt.",
+      8: "Mate: Such dir einen Trink-Buddy.",
+      9: "Rhyme: Reimrunde!",
+      10: "Categories: Kategorie nennen.",
+      J: "Rule: Du erfindest eine Regel.",
+      Q: "Question Master.",
+      K: "King: In den Cup damit."
+    };
+
+    const DICE_FACES = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
+
+    function $(selector, root = document) {
+      return root.querySelector(selector);
+    }
+
+    function $all(selector, root = document) {
+      return Array.from(root.querySelectorAll(selector));
+    }
+
+    function byId(id) {
+      return document.getElementById(id);
+    }
+
+    function setText(id, value) {
+      const node = byId(id);
+      if (node) node.textContent = value;
+    }
+
+    function storeGet(key, fallback) {
+      try {
+        const raw = localStorage.getItem(STORE_PREFIX + key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function storeSet(key, value) {
+      try {
+        localStorage.setItem(STORE_PREFIX + key, JSON.stringify(value));
+      } catch {
+        // Storage can fail in private browsing. The app remains usable for this session.
+      }
+    }
+
+    function nowLocalDay() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+
+    function nowLocalHour() {
+      return String(new Date().getHours()).padStart(2, "0");
+    }
+
+    function dateFromKey(key) {
+      return new Date(`${key}T12:00:00`);
+    }
+
+    function formatDay(key) {
+      return new Intl.DateTimeFormat("de-AT", { weekday: "short", day: "2-digit", month: "2-digit" }).format(dateFromKey(key));
+    }
+
+    function formatDateTime(ts) {
+      if (!ts) return "gerade eben";
+      return new Intl.DateTimeFormat("de-AT", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date(ts));
+    }
+
+    function clampText(value, max) {
+      return String(value || "").trim().slice(0, max);
+    }
+
+    function randomItem(items) {
+      return items[Math.floor(Math.random() * items.length)];
+    }
+
+    function shuffle(items) {
+      return [...items].sort(() => Math.random() - 0.5);
+    }
+
+    function rootPath(...parts) {
+      return [CONFIG.firebase.rootPath, ...parts].filter(Boolean).join("/");
+    }
+
+    function showToast(message) {
+      const toast = byId("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove("show"), 2600);
+    }
+
+    function getBeerData() {
+      return storeGet("beerData", { byDay: {}, history: [], lastBeerAt: 0 });
+    }
+
+    function saveBeerData(data) {
+      data.history = (data.history || []).slice(-800);
+      storeSet("beerData", data);
+    }
+
+    function localTotalBeers() {
+      const data = getBeerData();
+      return Object.values(data.byDay || {}).reduce((sum, value) => sum + Number(value || 0), 0);
+    }
+
+    function unlock(id) {
+      const unlocked = storeGet("achievements", {});
+      if (!unlocked[id]) {
+        unlocked[id] = Date.now();
+        storeSet("achievements", unlocked);
+        renderAchievements();
+        const achievement = ACHIEVEMENTS.find(item => item.id === id);
+        if (achievement) showToast(`${achievement.icon} Achievement: ${achievement.title}`);
+      }
+    }
+
+    function isFirebaseConfigured() {
+      if (!CONFIG.firebase || !CONFIG.firebase.enabled) return false;
+      const cfg = CONFIG.firebase.config || {};
+      const required = ["apiKey", "authDomain", "databaseURL", "projectId", "appId"];
+      if (!required.every(key => typeof cfg[key] === "string" && cfg[key].trim())) return false;
+      const joined = required.map(key => cfg[key]).join(" ");
+      return !/(DEIN_|YOUR_|PROJECT|example|firebaseapp\.com$)/i.test(joined);
+    }
+
+    function setFirebasePill(mode, message) {
+      const pill = byId("firebasePill");
+      pill.textContent = message;
+      pill.classList.remove("good", "warn", "bad");
+      if (mode) pill.classList.add(mode);
+    }
+
+    function initStaticContent() {
+      document.title = CONFIG.campName;
+      setText("topFestival", CONFIG.festivalLabel);
+      setText("topCampName", CONFIG.campName);
+      setText("heroFestival", CONFIG.festivalLabel);
+      setText("heroTitle", CONFIG.campName);
+      setText("heroDescription", CONFIG.description);
+      setText("campIntro", `${CONFIG.campName}: ${CONFIG.description}`);
+      setText("dateRange", `${formatDay(CONFIG.festivalDays[0])} – ${formatDay(CONFIG.festivalDays.at(-1))}`);
+
+      const campImage = byId("campImage");
+      campImage.src = CONFIG.campImageUrl || "";
+      campImage.alt = `${CONFIG.campName} Camp-Foto`;
+      campImage.addEventListener("error", () => renderImageFallback("campImageWrap", "Camp-Foto nicht gefunden. Prüfe CONFIG.campImageUrl."));
+
+      const mapImage = byId("mapImage");
+      mapImage.src = CONFIG.mapImageUrl || "";
+      mapImage.alt = `${CONFIG.campName} Standortkarte`;
+      mapImage.addEventListener("error", () => {
+        renderImageFallback("mapImageWrap", "Standortbild nicht gefunden. Prüfe CONFIG.mapImageUrl.");
+        setText("mapStatus", "kein Bild");
+      });
+
+      const { lat, lng } = CONFIG.coordinates || {};
+      const hasCoords = Number.isFinite(lat) && Number.isFinite(lng);
+      setText("latText", hasCoords ? lat.toFixed(6) : "wird ergänzt");
+      setText("lngText", hasCoords ? lng.toFixed(6) : "wird ergänzt");
+      const mapsLink = byId("mapsLink");
+      if (hasCoords) {
+        mapsLink.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${lat},${lng}`)}`;
+        mapsLink.classList.remove("hidden");
+      }
+
+      renderSpotify();
+      renderMember();
+      renderQuote();
+      renderDrinkPlayers();
+      renderTenPlayerChips();
+    }
+
+    function renderImageFallback(wrapId, text) {
+      const wrap = byId(wrapId);
+      wrap.replaceChildren();
+      const fallback = document.createElement("div");
+      fallback.className = "media-fallback";
+      fallback.textContent = text;
+      wrap.append(fallback);
+    }
+
+    function renderSpotify() {
+      const mount = byId("spotifyMount");
+      const id = String(CONFIG.spotifyPlaylistId || "").trim().replace(/[?&#].*$/, "");
+      mount.replaceChildren();
+      if (!/^[A-Za-z0-9]{15,}$/.test(id)) {
+        mount.className = "media-fallback";
+        mount.textContent = "Playlist-ID fehlt oder ist ungültig.";
+        return;
+      }
+      const iframe = document.createElement("iframe");
+      iframe.title = "Spotify Playlist";
+      iframe.src = `https://open.spotify.com/embed/playlist/${encodeURIComponent(id)}?utm_source=generator`;
+      iframe.width = "100%";
+      iframe.height = "352";
+      iframe.allow = "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture";
+      iframe.loading = "lazy";
+      iframe.style.border = "0";
+      iframe.style.borderRadius = "18px";
+      mount.className = "";
+      mount.append(iframe);
+    }
+
+    function renderMember() {
+      const members = CONFIG.members || [];
+      if (!members.length) return;
+      const member = members[state.memberIndex % members.length];
+      const avatar = byId("memberAvatar");
+      avatar.replaceChildren();
+      if (member.image) {
+        const img = document.createElement("img");
+        img.src = member.image;
+        img.alt = member.name;
+        img.loading = "lazy";
+        img.addEventListener("error", () => {
+          avatar.replaceChildren();
+          avatar.textContent = member.emoji || "🤘";
+        });
+        avatar.append(img);
+      } else {
+        avatar.textContent = member.emoji || "🤘";
+      }
+      setText("memberName", `${member.emoji || "🤘"} ${member.name}`);
+      setText("memberRole", member.role || "Campmitglied");
+      setText("memberBio", member.bio || "Bereit für das Festival.");
+    }
+
+    function getQuotes() {
+      return [...(CONFIG.quotes || []), ...storeGet("localQuotes", [])];
+    }
+
+    function renderQuote() {
+      const quotes = getQuotes();
+      const output = byId("quoteOutput");
+      if (!quotes.length) {
+        output.textContent = "Noch kein Zitat.";
+        return;
+      }
+      state.quoteIndex = (state.quoteIndex + quotes.length) % quotes.length;
+      output.textContent = `„${quotes[state.quoteIndex]}“`;
+    }
+
+    function initNavigation() {
+      const navLinks = [...$all(".nav a"), ...$all(".bottom-nav a")];
+      const sections = $all("[data-section]");
+      const observer = new IntersectionObserver(entries => {
+        const visible = entries.filter(entry => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (!visible) return;
+        const id = visible.target.id;
+        navLinks.forEach(link => link.classList.toggle("active", link.getAttribute("href") === `#${id}`));
+      }, { rootMargin: "-35% 0px -50% 0px", threshold: [0.1, 0.25, 0.5] });
+      sections.forEach(section => observer.observe(section));
+    }
+
+    function initCampControls() {
+      byId("memberPrev").addEventListener("click", () => {
+        state.memberIndex = (state.memberIndex - 1 + CONFIG.members.length) % CONFIG.members.length;
+        renderMember();
+      });
+      byId("memberNext").addEventListener("click", () => {
+        state.memberIndex = (state.memberIndex + 1) % CONFIG.members.length;
+        renderMember();
+      });
+
+      byId("quotePrev").addEventListener("click", () => {
+        state.quoteIndex -= 1;
+        renderQuote();
+      });
+      byId("quoteNext").addEventListener("click", () => {
+        state.quoteIndex += 1;
+        renderQuote();
+      });
+      byId("quoteFormToggle").addEventListener("click", () => byId("quoteForm").classList.toggle("hidden"));
+      byId("quoteForm").addEventListener("submit", event => {
+        event.preventDefault();
+        const passwordInput = byId("quotePasswordInput");
+        const input = byId("quoteInput");
+        const password = (passwordInput.value || "").trim();
+        const quote = clampText(input.value, 120);
+        if (password !== CONFIG.quotePassword) {
+          showToast("Falsches Zitat-Passwort.");
+          passwordInput.focus();
+          return;
+        }
+        if (!quote) {
+          showToast("Zitat fehlt noch.");
+          input.focus();
+          return;
+        }
+        const quotes = storeGet("localQuotes", []);
+        quotes.push(quote);
+        storeSet("localQuotes", quotes.slice(-40));
+        input.value = "";
+        passwordInput.value = "";
+        byId("quoteForm").classList.add("hidden");
+        state.quoteIndex = getQuotes().length - 1;
+        renderQuote();
+        showToast("Zitat gespeichert.");
+      });
+
+      byId("copyLocationBtn").addEventListener("click", async () => {
+        const { lat, lng } = CONFIG.coordinates || {};
+        const text = Number.isFinite(lat) && Number.isFinite(lng)
+          ? `${CONFIG.campName}: ${lat}, ${lng}`
+          : `${CONFIG.campName}: Standortbild ${CONFIG.mapImageUrl || "nicht gesetzt"}`;
+        try {
+          await navigator.clipboard.writeText(text);
+          showToast("Standort kopiert.");
+        } catch {
+          showToast(text);
+        }
+      });
+    }
+
+    function initBeer() {
+      byId("beerButton").addEventListener("click", handleBeerClick);
+      renderBeer();
+      renderStats();
+      window.setInterval(updateCountdownAndCooldown, 1000);
+      updateCountdownAndCooldown();
+    }
+
+    async function handleBeerClick() {
+      const data = getBeerData();
+      const elapsed = Date.now() - Number(data.lastBeerAt || 0);
+      const cooldownMs = Number(CONFIG.cooldownSec || 30) * 1000;
+      if (elapsed < cooldownMs) {
+        const remaining = Math.ceil((cooldownMs - elapsed) / 1000);
+        setText("beerStatus", `Noch ${remaining}s Cooldown. Wasser ist erlaubt.`);
+        return;
+      }
+
+      const day = nowLocalDay();
+      data.byDay[day] = Number(data.byDay[day] || 0) + 1;
+      data.history.push(new Date().toISOString());
+      data.lastBeerAt = Date.now();
+      saveBeerData(data);
+      setText("beerStatus", "Lokal gezählt. Prost!");
+      renderBeer();
+      renderStats();
+
+      unlock("first_beer");
+      if (data.byDay[day] >= 5) unlock("five_today");
+      if (localTotalBeers() >= 10) unlock("ten_total");
+
+      if (state.firebase.ready) {
+        try {
+          await pushBeerToFirebase(day, nowLocalHour());
+          setText("beerStatus", "Lokal und global gezählt. Prost!");
+        } catch (error) {
+          console.warn("Firebase beer write failed", error);
+          setText("beerStatus", "Lokal gezählt. Firebase hat den Write abgelehnt.");
+        }
+      }
+    }
+
+    async function pushBeerToFirebase(day, hour) {
+      const { ref, update, increment, serverTimestamp } = state.firebase.api;
+      const updates = {
+        [`public/totalBeers`]: increment(1),
+        [`public/byDay/${day}`]: increment(1),
+        [`public/byHour/${day}/${hour}`]: increment(1),
+        [`users/${state.firebase.uid}/totalBeers`]: increment(1),
+        [`users/${state.firebase.uid}/byDay/${day}`]: increment(1),
+        [`users/${state.firebase.uid}/lastBeerAt`]: serverTimestamp()
+      };
+      await update(ref(state.firebase.db, CONFIG.firebase.rootPath), updates);
+    }
+
+    function renderBeer() {
+      const data = getBeerData();
+      const day = nowLocalDay();
+      const localToday = Number(data.byDay?.[day] || 0);
+      const localTotal = localTotalBeers();
+      const globalTotal = state.firebase.totalBeers ?? localTotal;
+
+      setText("todayLocalBeers", String(localToday));
+      setText("localTotalBeers", String(localTotal));
+      setText("globalTotalBeers", String(globalTotal));
+      setText("heroGlobalBeers", String(globalTotal));
+      setText("heroVisitors", state.firebase.visitors == null ? "–" : String(state.firebase.visitors));
+
+      const tbody = byId("localBeerTable");
+      tbody.replaceChildren();
+      const days = Object.keys(data.byDay || {}).sort();
+      if (!days.length) {
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = 2;
+        cell.textContent = "Noch keine Daten";
+        row.append(cell);
+        tbody.append(row);
+        return;
+      }
+      for (const key of days) {
+        const row = document.createElement("tr");
+        const dayCell = document.createElement("td");
+        const countCell = document.createElement("td");
+        dayCell.textContent = formatDay(key);
+        countCell.textContent = data.byDay[key];
+        row.append(dayCell, countCell);
+        tbody.append(row);
+      }
+    }
+
+    function deriveLocalHoursForToday() {
+      const today = nowLocalDay();
+      const data = getBeerData();
+      return (data.history || []).reduce((acc, iso) => {
+        if (iso.slice(0, 10) !== today) return acc;
+        const hour = String(new Date(iso).getHours()).padStart(2, "0");
+        acc[hour] = Number(acc[hour] || 0) + 1;
+        return acc;
+      }, {});
+    }
+
+    function renderStats() {
+      const local = getBeerData();
+      const byDay = Object.keys(state.firebase.byDay || {}).length ? state.firebase.byDay : (local.byDay || {});
+      const byHour = Object.keys(state.firebase.byHourToday || {}).length ? state.firebase.byHourToday : deriveLocalHoursForToday();
+
+      renderBarChart("dayChart", byDay, key => formatDay(key));
+      renderBarChart("hourChart", byHour, key => `${key}:00`);
+
+      const tbody = byId("globalStatsTable");
+      tbody.replaceChildren();
+      const days = Object.keys(byDay).sort();
+      if (!days.length) {
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = 3;
+        cell.textContent = "Noch keine Daten";
+        row.append(cell);
+        tbody.append(row);
+        return;
+      }
+      for (const day of days) {
+        const row = document.createElement("tr");
+        const dayCell = document.createElement("td");
+        const countCell = document.createElement("td");
+        const activeCell = document.createElement("td");
+        const hours = day === nowLocalDay()
+          ? byHour
+          : {};
+        const activeHour = Object.entries(hours).sort((a, b) => b[1] - a[1])[0]?.[0] || "–";
+        dayCell.textContent = formatDay(day);
+        countCell.textContent = byDay[day];
+        activeCell.textContent = activeHour === "–" ? "–" : `${activeHour}:00`;
+        row.append(dayCell, countCell, activeCell);
+        tbody.append(row);
+      }
+    }
+
+    function renderBarChart(id, values, labeler) {
+      const mount = byId(id);
+      mount.replaceChildren();
+      const entries = Object.entries(values || {}).filter(([, value]) => Number(value) > 0).sort(([a], [b]) => a.localeCompare(b));
+      if (!entries.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "Noch keine Daten";
+        mount.append(empty);
+        return;
+      }
+      const max = Math.max(...entries.map(([, value]) => Number(value)));
+      for (const [key, value] of entries) {
+        const row = document.createElement("div");
+        row.className = "bar-row";
+        const label = document.createElement("span");
+        label.textContent = labeler(key);
+        const track = document.createElement("div");
+        track.className = "bar-track";
+        const fill = document.createElement("div");
+        fill.className = "bar-fill";
+        fill.style.width = `${Math.max(5, (Number(value) / max) * 100)}%`;
+        track.append(fill);
+        const count = document.createElement("strong");
+        count.textContent = value;
+        row.append(label, track, count);
+        mount.append(row);
+      }
+    }
+
+    function updateCountdownAndCooldown() {
+      const now = Date.now();
+      const start = dateFromKey(CONFIG.festivalDays[0]).getTime();
+      const end = dateFromKey(CONFIG.festivalDays.at(-1)).getTime() + 36 * 60 * 60 * 1000;
+      if (now < start) {
+        const diff = start - now;
+        const days = Math.floor(diff / 86400000);
+        const hours = Math.floor((diff % 86400000) / 3600000);
+        setText("countdown", `${days}T ${hours}H`);
+      } else if (now <= end) {
+        setText("countdown", "Jetzt!");
+      } else {
+        setText("countdown", "Danke!");
+      }
+
+      const data = getBeerData();
+      const remaining = Math.ceil(((Number(data.lastBeerAt || 0) + Number(CONFIG.cooldownSec || 30) * 1000) - Date.now()) / 1000);
+      const button = byId("beerButton");
+      if (remaining > 0) {
+        button.disabled = true;
+        setText("beerStatus", `Cooldown: ${remaining}s`);
+      } else {
+        button.disabled = false;
+        if (byId("beerStatus").textContent.startsWith("Cooldown")) setText("beerStatus", "Bereit!");
+      }
+    }
+
+    async function initFirebase() {
+      if (!isFirebaseConfigured()) {
+        byId("setupBox").classList.remove("hidden");
+        setFirebasePill("warn", "🟡 Lokalmodus");
+        return;
+      }
+
+      setFirebasePill("warn", "🟡 Verbinde Firebase …");
+      try {
+        const version = CONFIG.firebase.sdkVersion || "12.14.0";
+        const base = `https://www.gstatic.com/firebasejs/${version}`;
+        const [appMod, authMod, dbMod] = await Promise.all([
+          import(`${base}/firebase-app.js`),
+          import(`${base}/firebase-auth.js`),
+          import(`${base}/firebase-database.js`)
+        ]);
+
+        const app = appMod.initializeApp(CONFIG.firebase.config);
+        const auth = authMod.getAuth(app);
+        const db = dbMod.getDatabase(app);
+        const credential = await authMod.signInAnonymously(auth);
+
+        state.firebase.ready = true;
+        state.firebase.uid = credential.user.uid;
+        state.firebase.db = db;
+        state.firebase.api = dbMod;
+
+        setFirebasePill("good", "🟢 Firebase aktiv");
+        byId("setupBox").classList.add("hidden");
+        byId("guestHint").textContent = "Einträge werden global gespeichert und durch Firebase-Rules validiert.";
+
+        await registerVisit();
+        attachFirebaseListeners();
+      } catch (error) {
+        console.warn("Firebase init failed", error);
+        setFirebasePill("bad", "🔴 Firebase Fehler");
+        byId("setupBox").classList.remove("hidden");
+      }
+    }
+
+    async function registerVisit() {
+      const { ref, update, increment, serverTimestamp } = state.firebase.api;
+      const localKey = `visitRegistered:${state.firebase.uid}`;
+      const root = ref(state.firebase.db, CONFIG.firebase.rootPath);
+
+      if (!storeGet(localKey, false)) {
+        try {
+          await update(root, {
+            [`visitorDevices/${state.firebase.uid}/createdAt`]: serverTimestamp(),
+            [`visitorDevices/${state.firebase.uid}/lastSeen`]: serverTimestamp(),
+            [`visitorDevices/${state.firebase.uid}/visits`]: increment(1),
+            "public/visitors": increment(1)
+          });
+          storeSet(localKey, true);
+          return;
+        } catch (error) {
+          console.warn("First visit registration failed, trying touch only", error);
+        }
+      }
+
+      try {
+        await update(root, {
+          [`visitorDevices/${state.firebase.uid}/lastSeen`]: serverTimestamp(),
+          [`visitorDevices/${state.firebase.uid}/visits`]: increment(1)
+        });
+      } catch (error) {
+        console.warn("Visit touch failed", error);
+      }
+    }
+
+    function attachFirebaseListeners() {
+      const { ref, onValue, query, orderByChild, limitToLast } = state.firebase.api;
+      const db = state.firebase.db;
+
+      state.firebase.listeners.push(onValue(ref(db, rootPath("public", "totalBeers")), snapshot => {
+        state.firebase.totalBeers = Number(snapshot.val() || 0);
+        renderBeer();
+      }));
+
+      state.firebase.listeners.push(onValue(ref(db, rootPath("public", "visitors")), snapshot => {
+        state.firebase.visitors = Number(snapshot.val() || 0);
+        renderBeer();
+      }));
+
+      state.firebase.listeners.push(onValue(ref(db, rootPath("public", "byDay")), snapshot => {
+        state.firebase.byDay = snapshot.val() || {};
+        renderStats();
+      }));
+
+      state.firebase.listeners.push(onValue(ref(db, rootPath("public", "byHour", nowLocalDay())), snapshot => {
+        state.firebase.byHourToday = snapshot.val() || {};
+        renderStats();
+      }));
+
+      const guestQuery = query(ref(db, rootPath("guestbook")), orderByChild("createdAt"), limitToLast(20));
+      state.firebase.listeners.push(onValue(guestQuery, snapshot => {
+        const entries = [];
+        snapshot.forEach(child => entries.push({ id: child.key, ...child.val() }));
+        state.guestEntries = entries.sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
+        renderGuestbook();
+      }));
+    }
+
+    function initGuestbook() {
+      byId("guestForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        const name = clampText(byId("guestName").value, 32);
+        const message = clampText(byId("guestMessage").value, 240);
+        if (!name || !message) return;
+
+        if (state.firebase.ready) {
+          try {
+            const { ref, push, set, serverTimestamp } = state.firebase.api;
+            const entryRef = push(ref(state.firebase.db, rootPath("guestbook")));
+            await set(entryRef, {
+              uid: state.firebase.uid,
+              name,
+              message,
+              createdAt: serverTimestamp()
+            });
+            byId("guestForm").reset();
+            unlock("guestbook");
+            showToast("Gästebuch-Eintrag gespeichert.");
+            return;
+          } catch (error) {
+            console.warn("Guestbook write failed", error);
+            showToast("Firebase hat den Eintrag abgelehnt. Lokal gespeichert.");
+          }
+        }
+
+        const entries = storeGet("localGuestbook", []);
+        entries.unshift({ id: crypto.randomUUID(), name, message, createdAt: Date.now() });
+        storeSet("localGuestbook", entries.slice(0, 20));
+        byId("guestForm").reset();
+        state.guestEntries = entries;
+        renderGuestbook();
+        unlock("guestbook");
+      });
+
+      state.guestEntries = storeGet("localGuestbook", []);
+      renderGuestbook();
+    }
+
+    function renderGuestbook() {
+      const mount = byId("guestList");
+      mount.replaceChildren();
+      if (!state.guestEntries.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "Noch keine Einträge.";
+        mount.append(empty);
+        return;
+      }
+
+      for (const entry of state.guestEntries.slice(0, 20)) {
+        const card = document.createElement("article");
+        card.className = "guest-entry";
+        const name = document.createElement("strong");
+        name.textContent = entry.name || "Gast";
+        const meta = document.createElement("small");
+        meta.className = "muted";
+        meta.textContent = formatDateTime(entry.createdAt);
+        const message = document.createElement("p");
+        message.textContent = entry.message || "";
+        card.append(name, meta, message);
+        mount.append(card);
+      }
+    }
+
+    function initGames() {
+      byId("coinBtn").addEventListener("click", () => {
+        const coin = byId("coinFace");
+        coin.classList.remove("spin");
+        void coin.offsetWidth;
+        coin.classList.add("spin");
+        const result = Math.random() < 0.5 ? "Kopf" : "Zahl";
+        coin.textContent = result === "Kopf" ? "K" : "Z";
+        setText("coinResult", `${result}! Das Schicksal hat gesprochen.`);
+        unlock("coin");
+      });
+
+      byId("taskBtn").addEventListener("click", () => {
+        const task = randomItem(CONFIG.tasks);
+        setText("taskOutput", task);
+        const history = storeGet("taskHistory", []);
+        history.unshift({ task, at: Date.now() });
+        storeSet("taskHistory", history.slice(0, 5));
+        renderTaskHistory();
+        unlock("task");
+      });
+      renderTaskHistory();
+
+      byId("slotBtn").addEventListener("click", () => {
+        const symbols = ["🍺", "🤘", "⭐", "🔥", "🎸", "🦊"];
+        const result = [randomItem(symbols), randomItem(symbols), randomItem(symbols)];
+        const mount = byId("slotReels");
+        mount.replaceChildren(...result.map(symbol => {
+          const span = document.createElement("span");
+          span.textContent = symbol;
+          return span;
+        }));
+        const unique = new Set(result).size;
+        const text = unique === 1
+          ? "Jackpot! Du bestimmst eine Regel."
+          : unique === 2
+            ? "Zwei gleiche! Such jemanden aus."
+            : "Kein Match. Du weißt, was zu tun ist.";
+        setText("slotResult", text);
+      });
+
+      initKingsCup();
+      initDrinkPicker();
+      initShell();
+      initBingo();
+      initTenThousand();
+    }
+
+    function renderTaskHistory() {
+      const mount = byId("taskHistory");
+      mount.replaceChildren();
+      const history = storeGet("taskHistory", []);
+      if (!history.length) return;
+      for (const item of history.slice(0, 3)) {
+        const row = document.createElement("div");
+        row.className = "history-item";
+        const p = document.createElement("p");
+        p.textContent = item.task;
+        row.append(p);
+        mount.append(row);
+      }
+    }
+
+    function initKingsCup() {
+      byId("kingDrawBtn").addEventListener("click", drawKingsCupCard);
+      byId("kingResetBtn").addEventListener("click", () => {
+        const game = createKingsCupGame();
+        saveKingsCupGame(game);
+        renderKingsCup(game, { animate: false });
+        showToast("Kings-Cup-Deck neu gemischt.");
+      });
+
+      const game = getKingsCupGame();
+      renderKingsCup(game, { animate: false });
+    }
+
+    function createKingsCupGame() {
+      const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+      const suits = ["♠", "♥", "♦", "♣"];
+      return {
+        deck: shuffle(ranks.flatMap(rank => suits.map(suit => ({ rank, suit })))),
+        drawn: [],
+        kings: 0,
+        finished: false,
+        lastCard: null
+      };
+    }
+
+    function getKingsCupGame() {
+      const game = storeGet("kingsCupGame", null);
+      if (!game || !Array.isArray(game.deck) || !Array.isArray(game.drawn)) return createKingsCupGame();
+      game.kings = Number(game.kings || 0);
+      game.finished = Boolean(game.finished);
+      return game;
+    }
+
+    function saveKingsCupGame(game) {
+      storeSet("kingsCupGame", game);
+    }
+
+    function drawKingsCupCard() {
+      const game = getKingsCupGame();
+      if (game.finished) {
+        setText("kingRule", "Der vierte König wurde schon gezogen. Starte ein neues Spiel.");
+        return;
+      }
+      if (!game.deck.length) {
+        game.finished = true;
+        saveKingsCupGame(game);
+        renderKingsCup(game, { animate: false });
+        return;
+      }
+      const card = game.deck.pop();
+      game.lastCard = card;
+      game.drawn.push(card);
+      if (card.rank === "K") game.kings += 1;
+      if (game.kings >= 4) game.finished = true;
+      saveKingsCupGame(game);
+      renderKingsCup(game, { animate: true });
+    }
+
+    function renderKingsCup(game, { animate } = { animate: false }) {
+      const visual = byId("kingCardVisual");
+      const front = byId("kingCardFront");
+      const card = game.lastCard;
+      const applyCard = () => {
+        const displayRank = card ? card.rank : "?";
+        const displaySuit = card ? card.suit : "?";
+        const red = card && (card.suit === "♥" || card.suit === "♦");
+        front.classList.toggle("red", Boolean(red));
+        setText("kingRank", displayRank);
+        setText("kingSuitBig", displaySuit);
+        setText("kingCornerTop", `${displayRank}\n${displaySuit}`);
+        setText("kingCornerBottom", `${displayRank}\n${displaySuit}`);
+        if (card) visual.classList.add("flipped");
+        else visual.classList.remove("flipped");
+      };
+
+      if (animate && card) {
+        visual.classList.remove("flipped");
+        window.setTimeout(applyCard, 130);
+      } else {
+        applyCard();
+      }
+
+      const rule = card
+        ? `${formatKingCard(card)} – ${KING_RULES[card.rank]}${game.finished ? " Vierter König: Cup leeren, Spiel vorbei!" : ""}`
+        : "Drücke auf „Karte ziehen“.";
+      setText("kingRule", rule);
+      setText("kingDeckCount", `${game.deck.length} Karten übrig`);
+      setText("kingCount", `${game.kings}/4 Könige`);
+      byId("kingDrawBtn").disabled = game.finished || !game.deck.length;
+
+      const chips = byId("kingDrawnChips");
+      chips.replaceChildren();
+      const recent = game.drawn.slice(-14).reverse();
+      for (const drawnCard of recent) {
+        const chip = document.createElement("span");
+        chip.className = `kc-chip ${drawnCard.rank === "K" ? "king" : ""} ${drawnCard.suit === "♥" || drawnCard.suit === "♦" ? "red" : ""}`;
+        chip.textContent = formatKingCard(drawnCard);
+        chips.append(chip);
+      }
+    }
+
+    function formatKingCard(card) {
+      return `${card.rank}${card.suit}`;
+    }
+
+    function getDrinkPlayers() {
+      return storeGet("drinkPlayers", (CONFIG.members || []).map(member => ({ name: member.name, active: true })));
+    }
+
+    function saveDrinkPlayers(players) {
+      storeSet("drinkPlayers", players);
+    }
+
+    function renderDrinkPlayers() {
+      const mount = byId("drinkPlayers");
+      mount.replaceChildren();
+      const players = getDrinkPlayers();
+      for (const player of players) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `chip ${player.active ? "active" : "off"}`;
+        button.textContent = player.name;
+        button.addEventListener("click", () => {
+          player.active = !player.active;
+          saveDrinkPlayers(players);
+          renderDrinkPlayers();
+        });
+        mount.append(button);
+      }
+    }
+
+    function initDrinkPicker() {
+      byId("drinkPlayerForm").addEventListener("submit", event => {
+        event.preventDefault();
+        const input = byId("drinkPlayerInput");
+        const name = clampText(input.value, 24);
+        if (!name) return;
+        const players = getDrinkPlayers();
+        if (!players.some(player => player.name.toLowerCase() === name.toLowerCase())) {
+          players.push({ name, active: true });
+          saveDrinkPlayers(players);
+          renderDrinkPlayers();
+        }
+        input.value = "";
+      });
+
+      byId("drinkPickBtn").addEventListener("click", () => {
+        const active = getDrinkPlayers().filter(player => player.active);
+        if (!active.length) {
+          setText("drinkResult", "Alle ausgeschlossen. Mutig.");
+          return;
+        }
+        setText("drinkResult", `${randomItem(active).name} wurde auserwählt.`);
+      });
+    }
+
+    function initShell() {
+      byId("shellForm").addEventListener("submit", event => {
+        event.preventDefault();
+        const answers = [
+          "Ja, aber trink zuerst Wasser.",
+          "Die Muschel ist dafür.",
+          "Frag nochmal nach dem nächsten Song.",
+          "Absolut. Keine weiteren Fragen.",
+          "Nur, wenn die Crew zustimmt.",
+          "Das klingt nach einer Camp-Regel."
+        ];
+        const question = byId("shellQuestion").value.trim();
+        setText("shellAnswer", question ? randomItem(answers) : "Du musst schon fragen.");
+      });
+    }
+
+    function initBingo() {
+      byId("bingoNewBtn").addEventListener("click", () => {
+        createNewBingo();
+        renderBingo();
+      });
+
+      if (!storeGet("bingoBoard", null)) createNewBingo();
+      renderBingo();
+    }
+
+    function createNewBingo() {
+      const items = shuffle(CONFIG.bingoItems).slice(0, 24);
+      items.splice(12, 0, "FREI");
+      storeSet("bingoBoard", items.map((text, index) => ({ text, checked: index === 12 })));
+    }
+
+    function renderBingo() {
+      const mount = byId("bingoGrid");
+      mount.replaceChildren();
+
+      for (const letter of ["B", "I", "N", "G", "O"]) {
+        const head = document.createElement("div");
+        head.className = "bingo-head";
+        head.textContent = letter;
+        mount.append(head);
+      }
+
+      const board = storeGet("bingoBoard", []);
+      board.forEach((cell, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `bingo-cell ${cell.checked ? "checked" : ""}`;
+        button.textContent = cell.text;
+        button.addEventListener("click", () => {
+          if (cell.text !== "FREI") cell.checked = !cell.checked;
+          storeSet("bingoBoard", board);
+          renderBingo();
+        });
+        mount.append(button);
+      });
+
+      const bingo = hasBingo(board);
+      setText("bingoStatus", bingo ? "BINGO!" : "Noch kein Bingo");
+      byId("bingoStatus").classList.toggle("good", bingo);
+      if (bingo) unlock("bingo");
+    }
+
+    function hasBingo(board) {
+      if (!board.length) return false;
+      const checked = index => board[index]?.checked;
+      for (let row = 0; row < 5; row++) {
+        if ([0,1,2,3,4].every(col => checked(row * 5 + col))) return true;
+      }
+      for (let col = 0; col < 5; col++) {
+        if ([0,1,2,3,4].every(row => checked(row * 5 + col))) return true;
+      }
+      return [0,6,12,18,24].every(checked) || [4,8,12,16,20].every(checked);
+    }
+
+    function renderAchievements() {
+      const mount = byId("achievementGrid");
+      mount.replaceChildren();
+      const unlocked = storeGet("achievements", {});
+      for (const achievement of ACHIEVEMENTS) {
+        const card = document.createElement("article");
+        card.className = `achievement ${unlocked[achievement.id] ? "unlocked" : ""}`;
+        const title = document.createElement("strong");
+        title.textContent = `${achievement.icon} ${achievement.title}`;
+        const desc = document.createElement("p");
+        desc.textContent = unlocked[achievement.id]
+          ? `${achievement.desc} Freigeschaltet am ${formatDateTime(unlocked[achievement.id])}.`
+          : achievement.desc;
+        card.append(title, desc);
+        mount.append(card);
+      }
+    }
+
+    function initTenThousand() {
+      state.ten = normalizeTenGame(storeGet("tenGame", null));
+      renderTenPlayerChips();
+      renderTenThousand();
+
+      byId("tenStartBtn").addEventListener("click", () => {
+        const selected = storeGet("tenPlayers", (CONFIG.members || []).map(member => member.name));
+        const unique = [...new Set(selected)].filter(Boolean);
+        if (unique.length < 2) {
+          showToast("Mindestens zwei Spieler auswählen.");
+          return;
+        }
+        state.ten = createTenGame(unique);
+        saveTen();
+        renderTenThousand();
+      });
+
+      byId("tenResetBtn").addEventListener("click", () => {
+        state.ten = null;
+        saveTen();
+        renderTenThousand();
+      });
+
+      byId("tenRollBtn").addEventListener("click", tenRoll);
+      byId("tenHoldBtn").addEventListener("click", tenHoldSelection);
+      byId("tenBankBtn").addEventListener("click", tenBank);
+    }
+
+    function createTenGame(playerNames) {
+      return {
+        players: playerNames.map(name => ({ name, score: 0, entered: false })),
+        current: 0,
+        turnScore: 0,
+        activeDice: 6,
+        currentRoll: [],
+        selected: [],
+        mustRoll: false,
+        locked: false,
+        finalRound: false,
+        finalTriggeredBy: null,
+        finalTurnsLeft: 0,
+        winner: null,
+        message: "Würfle, um zu beginnen.",
+        keptThisTurn: [],
+        history: []
+      };
+    }
+
+    function normalizeTenGame(game) {
+      if (!game || !Array.isArray(game.players) || game.players.length < 2) return null;
+      return {
+        ...createTenGame(game.players.map(player => player.name || "Spieler")),
+        ...game,
+        players: game.players.map(player => ({
+          name: player.name || "Spieler",
+          score: Number(player.score || 0),
+          entered: Boolean(player.entered)
+        })),
+        currentRoll: Array.isArray(game.currentRoll) ? game.currentRoll : [],
+        selected: Array.isArray(game.selected) ? game.selected : [],
+        keptThisTurn: Array.isArray(game.keptThisTurn) ? game.keptThisTurn : [],
+        history: Array.isArray(game.history) ? game.history.slice(0, 18) : []
+      };
+    }
+
+    function renderTenPlayerChips() {
+      const mount = byId("tenPlayerChips");
+      mount.replaceChildren();
+      const defaultPlayers = (CONFIG.members || []).map(member => member.name);
+      const selected = new Set(storeGet("tenPlayers", defaultPlayers));
+      for (const member of CONFIG.members || []) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `chip ${selected.has(member.name) ? "active" : "off"}`;
+        button.textContent = member.name;
+        button.addEventListener("click", () => {
+          if (selected.has(member.name)) selected.delete(member.name);
+          else selected.add(member.name);
+          storeSet("tenPlayers", [...selected]);
+          renderTenPlayerChips();
+        });
+        mount.append(button);
+      }
+    }
+
+    function saveTen() {
+      storeSet("tenGame", state.ten);
+    }
+
+    function renderTenThousand() {
+      const game = state.ten;
+      const scoreboard = byId("tenScoreboard");
+      const diceMount = byId("tenDice");
+      const keptMount = byId("tenKept");
+      const historyMount = byId("tenHistory");
+      scoreboard.replaceChildren();
+      diceMount.replaceChildren();
+      keptMount.replaceChildren();
+      historyMount.replaceChildren();
+
+      if (!game) {
+        setText("tenTurnTitle", "Noch kein Spiel");
+        setText("tenTurnScore", "0");
+        setText("tenSelectionScore", "0");
+        setText("tenActiveDice", "6");
+        setText("tenStatus", "Wähle mindestens zwei Spieler und starte das Spiel.");
+        setTenButtons({ canRoll: false, canHold: false, canBank: false });
+        scoreboard.append(emptyNode("Noch kein Scoreboard."));
+        historyMount.append(emptyNode("Noch kein Verlauf."));
+        return;
+      }
+
+      const player = game.players[game.current];
+      const selectedDice = getSelectedTenDice(game);
+      const selectedEval = evaluateTenDice(selectedDice);
+      const validSelection = selectedDice.length > 0 && selectedEval.valid && selectedEval.score > 0;
+      const canRoll = !game.winner && !game.locked && game.currentRoll.length === 0;
+      const canHold = !game.winner && !game.locked && game.currentRoll.length > 0 && validSelection;
+      const canBank = !game.winner && !game.locked && !game.mustRoll && game.currentRoll.length === 0 && game.turnScore > 0 && (player.entered || game.turnScore >= 350);
+
+      setText("tenTurnTitle", game.winner ? "Spiel vorbei" : `${player.name} ist dran`);
+      setText("tenTurnScore", String(game.turnScore));
+      setText("tenSelectionScore", validSelection ? String(selectedEval.score) : "0");
+      setText("tenActiveDice", String(game.activeDice || 6));
+      setText("tenStatus", game.winner ? `${game.winner} gewinnt mit ${getWinningScore(game)} Punkten!` : game.message);
+      setTenButtons({ canRoll, canHold, canBank });
+
+      if (game.currentRoll.length) {
+        game.currentRoll.forEach((value, index) => {
+          const die = document.createElement("button");
+          die.type = "button";
+          die.className = `die ten-die ${game.selected.includes(index) ? "selected" : ""}`;
+          die.textContent = DICE_FACES[value - 1];
+          die.disabled = Boolean(game.locked || game.winner);
+          die.addEventListener("click", () => toggleTenDie(index));
+          diceMount.append(die);
+        });
+      } else {
+        const hint = document.createElement("div");
+        hint.className = "empty";
+        hint.textContent = game.mustRoll ? "Bestätigungswurf: alle 6 Würfel sind wieder aktiv." : "Würfeln, um den Zug fortzusetzen.";
+        diceMount.append(hint);
+      }
+
+      if (game.keptThisTurn.length) {
+        const label = document.createElement("span");
+        label.textContent = "Gehalten:";
+        keptMount.append(label);
+        for (const value of game.keptThisTurn.slice(-12)) {
+          const die = document.createElement("span");
+          die.className = "mini-die";
+          die.textContent = DICE_FACES[value - 1];
+          keptMount.append(die);
+        }
+        if (game.mustRoll) {
+          const hot = document.createElement("span");
+          hot.className = "mini-die hot";
+          hot.textContent = "⚡ Bestätigung";
+          keptMount.append(hot);
+        }
+      } else {
+        keptMount.textContent = "Noch keine Würfel gehalten.";
+      }
+
+      for (const [index, item] of game.players.entries()) {
+        const row = document.createElement("div");
+        row.className = `player-row ${index === game.current && !game.winner ? "active" : ""}`;
+        const name = document.createElement("span");
+        const badges = [];
+        if (!item.entered) badges.push("nicht drin");
+        if (game.finalRound && index === game.finalTriggeredBy) badges.push("10k ausgelöst");
+        name.textContent = `${item.name}${badges.length ? ` (${badges.join(", ")})` : ""}`;
+        const score = document.createElement("strong");
+        score.textContent = item.score;
+        row.append(name, score);
+        scoreboard.append(row);
+      }
+
+      if (game.finalRound && !game.winner) {
+        const row = document.createElement("div");
+        row.className = "history-item";
+        const p = document.createElement("p");
+        p.textContent = `Finalrunde: ${game.finalTurnsLeft} letzte Züge übrig.`;
+        row.append(p);
+        scoreboard.append(row);
+      }
+
+      if (game.history.length) {
+        for (const entry of game.history.slice(0, 8)) {
+          const row = document.createElement("div");
+          row.className = "history-item";
+          const p = document.createElement("p");
+          p.textContent = entry;
+          row.append(p);
+          historyMount.append(row);
+        }
+      } else {
+        historyMount.append(emptyNode("Noch kein Verlauf."));
+      }
+    }
+
+    function setTenButtons({ canRoll, canHold, canBank }) {
+      byId("tenRollBtn").disabled = !canRoll;
+      byId("tenHoldBtn").disabled = !canHold;
+      byId("tenBankBtn").disabled = !canBank;
+    }
+
+    function toggleTenDie(index) {
+      const game = state.ten;
+      if (!game || game.locked || game.winner || !game.currentRoll.length) return;
+      if (game.selected.includes(index)) game.selected = game.selected.filter(item => item !== index);
+      else game.selected.push(index);
+      const selectedEval = evaluateTenDice(getSelectedTenDice(game));
+      if (game.selected.length && (!selectedEval.valid || selectedEval.score <= 0)) {
+        game.message = "Diese Auswahl zählt nicht. Wähle nur wertende Würfel.";
+      } else if (game.selected.length) {
+        game.message = `Auswahl: ${selectedEval.score} Punkte (${selectedEval.label}).`;
+      } else {
+        game.message = "Tippe die wertenden Würfel an, die du behalten willst.";
+      }
+      saveTen();
+      renderTenThousand();
+    }
+
+    function getSelectedTenDice(game) {
+      return game.selected.map(index => game.currentRoll[index]).filter(value => Number.isInteger(value));
+    }
+
+    function tenRoll() {
+      const game = state.ten;
+      if (!game || game.winner || game.locked || game.currentRoll.length) return;
+      const count = game.activeDice || 6;
+      game.currentRoll = Array.from({ length: count }, () => Math.floor(Math.random() * 6) + 1);
+      game.selected = [];
+      game.mustRoll = false;
+
+      if (!hasAnyTenScore(game.currentRoll)) {
+        const player = game.players[game.current];
+        game.message = `Niete! ${player.name} verliert ${game.turnScore} Zugpunkte.`;
+        game.locked = true;
+        game.history.unshift(`${player.name}: Niete mit ${formatDice(game.currentRoll)}.`);
+        saveTen();
+        renderTenThousand();
+        window.setTimeout(() => {
+          const latest = state.ten;
+          if (!latest || !latest.locked) return;
+          latest.locked = false;
+          latest.currentRoll = [];
+          latest.selected = [];
+          latest.turnScore = 0;
+          latest.keptThisTurn = [];
+          endTenTurn("Niete");
+        }, 1100);
+        return;
+      }
+
+      game.message = `Wurf: ${formatDice(game.currentRoll)}. Wähle mindestens einen wertenden Würfel.`;
+      saveTen();
+      renderTenThousand();
+    }
+
+    function tenHoldSelection() {
+      const game = state.ten;
+      if (!game || game.winner || game.locked || !game.currentRoll.length) return;
+      const selectedDice = getSelectedTenDice(game);
+      const result = evaluateTenDice(selectedDice);
+      if (!result.valid || result.score <= 0) {
+        showToast("Diese Würfel-Auswahl zählt nicht.");
+        return;
+      }
+
+      game.turnScore += result.score;
+      game.activeDice -= selectedDice.length;
+      game.keptThisTurn.push(...selectedDice);
+      game.history.unshift(`${game.players[game.current].name}: ${formatDice(selectedDice)} = +${result.score} (${result.label}).`);
+      game.currentRoll = [];
+      game.selected = [];
+
+      if (game.activeDice <= 0) {
+        game.activeDice = 6;
+        game.mustRoll = true;
+        game.message = `Alle 6 Würfel gewertet: ${game.turnScore} Punkte im Zug. Bestätigungswurf ist Pflicht.`;
+      } else {
+        const player = game.players[game.current];
+        const entryHint = !player.entered && game.turnScore < 350 ? ` Noch ${350 - game.turnScore} Punkte bis zum Einsteigen.` : "";
+        game.message = `+${result.score} behalten. Weiterwürfeln oder Punkte kassieren.${entryHint}`;
+      }
+      game.history = game.history.slice(0, 18);
+      saveTen();
+      renderTenThousand();
+    }
+
+    function tenBank() {
+      const game = state.ten;
+      if (!game || game.winner || game.locked || game.currentRoll.length || game.mustRoll) return;
+      const player = game.players[game.current];
+      if (!player.entered && game.turnScore < 350) {
+        showToast("350 Punkte zum Einsteigen nötig.");
+        return;
+      }
+      player.entered = true;
+      player.score += game.turnScore;
+      game.history.unshift(`${player.name} kassiert ${game.turnScore} Punkte und steht bei ${player.score}.`);
+
+      if (player.score >= 10000 && !game.finalRound) {
+        game.finalRound = true;
+        game.finalTriggeredBy = game.current;
+        game.finalTurnsLeft = game.players.length - 1;
+        game.history.unshift(`${player.name} hat 10.000 erreicht. Alle anderen bekommen einen letzten Zug.`);
+      }
+
+      endTenTurn("kassiert");
+    }
+
+    function endTenTurn(reason) {
+      const game = state.ten;
+      if (!game) return;
+      const endingIndex = game.current;
+
+      if (game.finalRound && endingIndex !== game.finalTriggeredBy) {
+        game.finalTurnsLeft = Math.max(0, Number(game.finalTurnsLeft || 0) - 1);
+      }
+
+      if (game.finalRound && game.finalTurnsLeft <= 0) {
+        finishTenGame();
+        return;
+      }
+
+      game.current = (game.current + 1) % game.players.length;
+      game.turnScore = 0;
+      game.activeDice = 6;
+      game.currentRoll = [];
+      game.selected = [];
+      game.mustRoll = false;
+      game.keptThisTurn = [];
+      game.message = `${game.players[game.current].name} ist dran. Würfle, um zu beginnen.`;
+      if (reason === "Niete") game.message = `${game.players[game.current].name} ist dran. Vorheriger Zug war eine Niete.`;
+      game.history = game.history.slice(0, 18);
+      saveTen();
+      renderTenThousand();
+    }
+
+    function finishTenGame() {
+      const game = state.ten;
+      const bestScore = Math.max(...game.players.map(player => player.score));
+      const winners = game.players.filter(player => player.score === bestScore).map(player => player.name);
+      game.winner = winners.join(" & ");
+      game.message = `${game.winner} gewinnt mit ${bestScore} Punkten!`;
+      game.currentRoll = [];
+      game.selected = [];
+      game.mustRoll = false;
+      game.locked = false;
+      game.history.unshift(`Spiel vorbei: ${game.winner} gewinnt mit ${bestScore} Punkten.`);
+      unlock("ten_win");
+      saveTen();
+      renderTenThousand();
+    }
+
+    function getWinningScore(game) {
+      return Math.max(...game.players.map(player => player.score));
+    }
+
+    function hasAnyTenScore(dice) {
+      const counts = diceCounts(dice);
+      if (dice.length === 6 && isStraight(counts)) return true;
+      if (dice.length === 6 && isThreePairs(counts)) return true;
+      return counts[1] > 0 || counts[5] > 0 || counts.some(count => count >= 3);
+    }
+
+    function evaluateTenDice(dice) {
+      if (!dice.length) return { valid: false, score: 0, label: "Keine Auswahl" };
+      const counts = diceCounts(dice);
+      if (dice.length === 6 && isStraight(counts)) return { valid: true, score: 3000, label: "Straße" };
+      if (dice.length === 6 && isThreePairs(counts)) return { valid: true, score: 1000, label: "3 Paare" };
+
+      let score = 0;
+      const labels = [];
+      for (let value = 1; value <= 6; value++) {
+        const count = counts[value];
+        if (!count) continue;
+        if (count >= 3) {
+          const base = value === 1 ? 1000 : value * 100;
+          const points = base * Math.pow(2, count - 3);
+          score += points;
+          labels.push(`${count}×${value}`);
+        } else if (value === 1) {
+          score += count * 100;
+          labels.push(`${count}×1`);
+        } else if (value === 5) {
+          score += count * 50;
+          labels.push(`${count}×5`);
+        } else {
+          return { valid: false, score: 0, label: "Nicht wertend" };
+        }
+      }
+      return { valid: score > 0, score, label: labels.join(" + ") || "Nicht wertend" };
+    }
+
+    function diceCounts(dice) {
+      const counts = [0, 0, 0, 0, 0, 0, 0];
+      dice.forEach(value => counts[value]++);
+      return counts;
+    }
+
+    function isStraight(counts) {
+      return [1, 2, 3, 4, 5, 6].every(value => counts[value] === 1);
+    }
+
+    function isThreePairs(counts) {
+      return counts.filter((count, index) => index > 0 && count === 2).length === 3;
+    }
+
+    function formatDice(dice) {
+      return dice.map(value => DICE_FACES[value - 1]).join(" ");
+    }
+
+    function emptyNode(text) {
+      const node = document.createElement("div");
+      node.className = "empty";
+      node.textContent = text;
+      return node;
+    }
+
+    function boot() {
+      initStaticContent();
+      initNavigation();
+      initCampControls();
+      initBeer();
+      initGuestbook();
+      initGames();
+      renderAchievements();
+      initFirebase();
+    }
+
+    boot();
+  </script>
+</body>
+</html>
