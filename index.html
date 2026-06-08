@@ -4,8 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#11071f">
-  <meta name="description" content="Nova Rock Website mit Biertracker, Gästebuch, Stats und Minispielen.">
-  <title>Biermuda-Viereck 🍺</title>
+  <meta name="description" content="Nova Rock Camp Website mit Biertracker, Gästebuch, Stats und Minispielen.">
+  <title>Nova Rock Camp</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="./favicon-192.png">
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+  <meta name="theme-color" content="#121212">
   <style>
     :root {
       color-scheme: dark;
@@ -1362,7 +1366,7 @@
         <div class="card mini-stat">
           <span>Besucher</span>
           <strong id="heroVisitors">–</strong>
-          <small class="muted">einmalig pro User</small>
+          <small class="muted">einmalig pro anonymem Firebase-User</small>
         </div>
       </aside>
     </div>
@@ -1384,12 +1388,12 @@
             <div class="media-wrap" id="campImageWrap">
               <img id="campImage" alt="Camp Foto" loading="lazy">
             </div>
-            <div class="media-caption" id="campImageCaption">Camp-Foto</div>
+            <div class="media-caption" id="campImageCaption">Camp-Foto aus dem Ordner fotos/.</div>
           </article>
 
           <article class="card">
             <h3>📍 Standort</h3>
-            <p class="lead small">Nutzt das Kartenbild und optional exakte Koordinaten.</p>
+            <p class="lead small">Nutzt das Kartenbild und optional exakte Koordinaten. Keine Fake-Koordinaten mehr: Wenn nichts gesetzt ist, zeigt die Seite sauber „wird ergänzt“.</p>
             <div class="kv" aria-live="polite">
               <span>Breitengrad</span><strong id="latText">wird ergänzt</strong>
               <span>Längengrad</span><strong id="lngText">wird ergänzt</strong>
@@ -1450,7 +1454,7 @@
               </label>
               <button class="primary-btn" type="submit">Zitat speichern</button>
             </form>
-            <p class="small muted">Neue Zitate können nur mit dem Camp-Passwort hinzugefügt werden.</p>
+            <p class="small muted">Neue Zitate können nur mit dem Camp-Passwort hinzugefügt werden. Hinweis: Bei einer statischen Website ist das ein einfacher Camp-Schutz, keine echte Admin-Sicherheit.</p>
           </article>
         </div>
       </div>
@@ -1463,7 +1467,7 @@
             <p class="eyebrow">Für die wichtigen Dinge</p>
             <h2 class="split-title"><span>Bier</span><span>Tracker</span></h2>
           </div>
-        
+          <p>Lokale Zähler funktionieren sofort. Globale Zähler laufen über Firebase mit Anonymous Auth und validierten Security Rules.</p>
         </div>
 
         <div class="grid two">
@@ -1503,7 +1507,7 @@
             <p class="eyebrow">Was bisher geschah</p>
             <h2 class="split-title"><span>Bier</span><span>Stats</span></h2>
           </div>
-          
+          <p>Keine externen Chart-Abhängigkeiten, keine kaputten Canvas-Plugins: einfache robuste CSS-Balken.</p>
         </div>
 
         <div class="grid two">
@@ -1629,7 +1633,7 @@
           <div class="bingo-scroll" aria-label="Festival Bingo: seitlich wischbarer Bereich">
             <div class="bingo-grid" id="bingoGrid" aria-label="Festival Bingo"></div>
           </div>
-          <p class="bingo-mobile-hint">Tipp: Auf schmalen Displays kannst du das Bingo-Board seitlich wischen.</p>
+          <p class="bingo-mobile-hint">Tipp: Auf sehr schmalen Displays kannst du das Bingo-Board seitlich wischen.</p>
           <div class="row-actions">
             <button class="primary-btn" type="button" id="bingoNewBtn">Neue Karte</button>
             <span class="pill" id="bingoStatus">Noch kein Bingo</span>
@@ -1645,6 +1649,7 @@
             <p class="eyebrow">Hinterlasse dein Zeichen</p>
             <h2 class="split-title"><span>Gäste</span><span>Buch</span></h2>
           </div>
+          <p>Benutzereingaben werden nicht per <code>innerHTML</code> gerendert. Firebase-Rules begrenzen Länge und Struktur.</p>
         </div>
 
         <div class="grid two">
@@ -1679,7 +1684,7 @@
             <p class="eyebrow">Erste Person auf 10.000 gewinnt</p>
             <h2 class="split-title"><span>Zehn</span><span>Tausend</span></h2>
           </div>
-          <p>Würfeln, wertende Würfel antippen, Auswahl behalten, Risiko nehmen oder Punkte kassieren.</p>
+          <p>Jetzt wieder wie ein richtiges 10.000-Spiel: würfeln, wertende Würfel antippen, Auswahl behalten, Risiko nehmen oder Punkte kassieren.</p>
         </div>
 
         <div class="grid two">
@@ -1731,7 +1736,7 @@
             <p class="eyebrow">Wirst du alle freischalten?</p>
             <h2 class="split-title"><span>Achieve</span><span>ments</span></h2>
           </div>
-          <p>Badges sind lokale Spaß-Erfolge.</p>
+          <p>Badges sind lokale Spaß-Erfolge und speichern keine privaten Daten online.</p>
         </div>
 
         <div class="achievement-grid grid three" id="achievementGrid"></div>
@@ -1771,14 +1776,11 @@
         sdkVersion: "12.14.0",
         rootPath: "novaRockCamp/v2",
         config: {
-          apiKey: "AIzaSyCkIy9362DHw7pgR9ogQv0Oy5CbRNU6wZI",
-          authDomain: "nr26-camp.firebaseapp.com",
-          databaseURL: "https://nr26-camp-default-rtdb.europe-west1.firebasedatabase.app",
-          projectId: "nr26-camp",
-          storageBucket: "nr26-camp.firebasestorage.app",
-          messagingSenderId: "657358712751",
-          appId: "1:657358712751:web:9b50e1f789c16f2276c95a",
-          measurementId: "G-2FF3NH4240"
+          apiKey: "DEINE_API_KEY",
+          authDomain: "DEIN_PROJEKT.firebaseapp.com",
+          databaseURL: "https://DEIN_PROJEKT-default-rtdb.europe-west1.firebasedatabase.app",
+          projectId: "DEIN_PROJEKT",
+          appId: "DEINE_APP_ID"
         }
       },
       members: [
@@ -1786,36 +1788,29 @@
           name: "Andreas",
           role: "Camp-Captain",
           bio: "Hat immer einen Plan, meistens auch Kabelbinder.",
-          emoji: "🦾",
+          emoji: "🦊",
           image: "fotos/Andreas.jpg"
         },
         {
           name: "Michael",
-          role: "Stimmungsminister ",
-          bio: "Jonny an, Alltag aus.",
-          emoji: "🥦",
+          role: "Sound & Stimmung",
+          bio: "Playlist an, Alltag aus.",
+          emoji: "🎸",
           image: "fotos/Michael.jpg"
         },
         {
           name: "Sophie",
           role: "Chaos-Management",
           bio: "Findet alles wieder, was andere verlieren.",
-          emoji: "🦦",
+          emoji: "✨",
           image: "fotos/Sophie.jpg"
         },
         {
           name: "Thomas",
-          role: "Bier-Logistik",
+          role: "Logistik",
           bio: "Kann einen Pavillon mit Blicken stabilisieren.",
-          emoji: "🦝",
+          emoji: "🧰",
           image: "fotos/Thomas.jpg"
-        },
-        {
-          name: "Sina",
-          role: "Playlist-Development",
-          bio: "Hat einen Song für jede Stimmung,
-          emoji: "🤘",
-          image: "fotos/Sina.jpg"
         }
       ],
       quotes: [
