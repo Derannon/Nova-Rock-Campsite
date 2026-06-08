@@ -1301,7 +1301,7 @@
         <div class="card mini-stat">
           <span>Besucher</span>
           <strong id="heroVisitors">–</strong>
-          <small class="muted">einmalig pro anonymem Firebase-User</small>
+          <!-- <small class="muted">einmalig pro anonymem Firebase-User</small> -->
         </div>
       </aside>
     </div>
@@ -1323,12 +1323,12 @@
             <div class="media-wrap" id="campImageWrap">
               <img id="campImage" alt="Camp Foto" loading="lazy">
             </div>
-            <div class="media-caption" id="campImageCaption">Camp-Foto aus dem Ordner fotos/.</div>
+            <!-- <div class="media-caption" id="campImageCaption">Camp-Foto aus dem Ordner fotos/.</div> -->
           </article>
 
           <article class="card">
             <h3>📍 Standort</h3>
-            <p class="lead small">Nutzt das Kartenbild und optional exakte Koordinaten. Keine Fake-Koordinaten mehr: Wenn nichts gesetzt ist, zeigt die Seite sauber „wird ergänzt“.</p>
+            <p class="lead small">Nutzt das Kartenbild und optional exakte Koordinaten.</p>
             <div class="kv" aria-live="polite">
               <span>Breitengrad</span><strong id="latText">wird ergänzt</strong>
               <span>Längengrad</span><strong id="lngText">wird ergänzt</strong>
@@ -1346,7 +1346,7 @@
             <div class="media-wrap" id="mapImageWrap">
               <img id="mapImage" alt="Camp Standort Karte" loading="lazy">
             </div>
-            <div class="media-caption">Standortbild: <code>fotos/Standort.png</code></div>
+            <!-- <div class="media-caption">Standortbild: <code>fotos/Standort.png</code></div> -->
           </article>
 
           <article class="card">
@@ -1369,7 +1369,7 @@
         <div class="grid two" style="margin-top:18px">
           <article class="card">
             <h3>🎵 Camp-Playlist</h3>
-            <div id="spotifyMount" class="media-fallback">Playlist-ID in der Konfiguration setzen.</div>
+             <!-- <div id="spotifyMount" class="media-fallback">Playlist-ID in der Konfiguration setzen.</div> -->
           </article>
 
           <article class="card">
@@ -1389,7 +1389,7 @@
               </label>
               <button class="primary-btn" type="submit">Zitat speichern</button>
             </form>
-            <p class="small muted">Neue Zitate können nur mit dem Camp-Passwort hinzugefügt werden. Hinweis: Bei einer statischen Website ist das ein einfacher Camp-Schutz, keine echte Admin-Sicherheit.</p>
+            <!-- <p class="small muted">Neue Zitate können nur mit dem Camp-Passwort hinzugefügt werden. Hinweis: Bei einer statischen Website ist das ein einfacher Camp-Schutz, keine echte Admin-Sicherheit.</p> -->
           </article>
         </div>
       </div>
@@ -1402,7 +1402,7 @@
             <p class="eyebrow">Für die wichtigen Dinge</p>
             <h2 class="split-title"><span>Bier</span><span>Tracker</span></h2>
           </div>
-          <p>Lokale Zähler funktionieren sofort. Globale Zähler laufen über Firebase mit Anonymous Auth und validierten Security Rules.</p>
+          <!-- <p>Lokale Zähler funktionieren sofort. Globale Zähler laufen über Firebase mit Anonymous Auth und validierten Security Rules.</p> -->
         </div>
 
         <div class="grid two">
@@ -1442,7 +1442,7 @@
             <p class="eyebrow">Was bisher geschah</p>
             <h2 class="split-title"><span>Bier</span><span>Stats</span></h2>
           </div>
-          <p>Keine externen Chart-Abhängigkeiten, keine kaputten Canvas-Plugins: einfache robuste CSS-Balken.</p>
+          <!-- <p>Keine externen Chart-Abhängigkeiten, keine kaputten Canvas-Plugins: einfache robuste CSS-Balken.</p> -->
         </div>
 
         <div class="grid two">
@@ -1701,7 +1701,7 @@
         lng: null
       },
       spotifyPlaylistId: "2OH5uA1XF39Ehe2Zzl1cet",
-      cooldownSec: 30,
+      cooldownSec: 20,
       quotePassword: "NR26",
       firebase: {
         enabled: true,
@@ -1728,8 +1728,8 @@
         },
         {
           name: "Michael",
-          role: "Stimmung ",
-          bio: "Playlist an, Alltag aus.",
+          role: "Stimmungsminister ",
+          bio: "Jonny an, Alltag aus.",
           emoji: "🥦",
           image: "fotos/Michael.jpg"
         },
@@ -1750,8 +1750,8 @@
         {
           name: "Sina",
           role: "Playlist-Development",
-          bio: "Kann einen Pavillon mit Blicken stabilisieren.",
-          emoji: "🤘",
+          bio: "Hat für jeden Musikgeschmack was dabei.",
+          emoji: "🎸",
           image: "fotos/Sina.jpg"
         }
       ],
