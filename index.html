@@ -2683,7 +2683,7 @@
 
         setFirebasePill("good", "🟢 Firebase aktiv");
         byId("setupBox").classList.add("hidden");
-        byId("guestHint").textContent = "Einträge werden global gespeichert.";
+        byId("guestHint").textContent = "Einträge werden global gespeichert und durch Firebase-Rules validiert.";
 
         await registerVisit();
         attachFirebaseListeners();
