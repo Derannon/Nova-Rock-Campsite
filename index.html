@@ -975,14 +975,37 @@
       text-decoration: line-through;
     }
 
+    .bingo-scroll {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-x: contain;
+      padding: 2px 2px 8px;
+      scrollbar-color: rgba(255,255,255,.34) transparent;
+    }
+
+    .bingo-scroll::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .bingo-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,.28);
+      border-radius: 999px;
+    }
+
     .bingo-grid {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      width: 100%;
+      min-width: 0;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 8px;
     }
 
     .bingo-head,
     .bingo-cell {
+      min-width: 0;
       min-height: 64px;
       border-radius: 14px;
       display: grid;
@@ -990,6 +1013,10 @@
       text-align: center;
       padding: 8px;
       font-weight: 950;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      hyphens: auto;
+      touch-action: manipulation;
     }
 
     .bingo-head {
@@ -1005,6 +1032,15 @@
       color: var(--muted);
       line-height: 1.15;
       font-size: clamp(.72rem, 1.7vw, .92rem);
+      white-space: normal;
+    }
+
+    .bingo-mobile-hint {
+      display: none;
+      margin: 8px 2px 0;
+      color: var(--muted);
+      font-size: .78rem;
+      line-height: 1.35;
     }
 
     .bingo-cell.checked {
@@ -1226,13 +1262,38 @@
         font-size: .85rem;
       }
 
+      .bingo-scroll {
+        margin-inline: -6px;
+        padding-inline: 6px;
+      }
+
       .bingo-grid {
-        gap: 6px;
+        gap: 5px;
+      }
+
+      .bingo-head {
+        min-height: 32px;
+        border-radius: 10px;
+        padding: 5px 3px;
+        font-size: .98rem;
       }
 
       .bingo-cell {
-        min-height: 58px;
-        padding: 5px;
+        min-height: 54px;
+        border-radius: 10px;
+        padding: 4px 3px;
+        font-size: clamp(.54rem, 2.35vw, .72rem);
+        line-height: 1.05;
+      }
+
+      .bingo-mobile-hint {
+        display: block;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .bingo-grid {
+        min-width: 340px;
       }
     }
 
@@ -1315,7 +1376,7 @@
             <p class="eyebrow">Zuhause auf Zeit</p>
             <h2 class="split-title"><span>Unser</span><span>Camp</span></h2>
           </div>
-          <!-- <p id="campIntro">Foto, Standort, Crew und Playlist an einem Ort.</p> -->
+          <p id="campIntro">Foto, Standort, Crew und Playlist an einem Ort.</p>
         </div>
 
         <div class="grid two">
@@ -1323,12 +1384,12 @@
             <div class="media-wrap" id="campImageWrap">
               <img id="campImage" alt="Camp Foto" loading="lazy">
             </div>
-            <div class="media-caption" id="campImageCaption">Ansicht des Camps</div>
+            <div class="media-caption" id="campImageCaption">Camp-Foto aus dem Ordner fotos/.</div>
           </article>
 
           <article class="card">
             <h3>📍 Standort</h3>
-            <p class="lead small">Nutzt das Kartenbild und optional exakte Koordinaten.</p>
+            <p class="lead small">Nutzt das Kartenbild und optional exakte Koordinaten. Keine Fake-Koordinaten mehr: Wenn nichts gesetzt ist, zeigt die Seite sauber „wird ergänzt“.</p>
             <div class="kv" aria-live="polite">
               <span>Breitengrad</span><strong id="latText">wird ergänzt</strong>
               <span>Längengrad</span><strong id="lngText">wird ergänzt</strong>
@@ -1346,7 +1407,7 @@
             <div class="media-wrap" id="mapImageWrap">
               <img id="mapImage" alt="Camp Standort Karte" loading="lazy">
             </div>
-            <div class="media-caption">Standortbild: <code>Mapsstandort</code></div>
+            <div class="media-caption">Standortbild: <code>fotos/Standort.png</code></div>
           </article>
 
           <article class="card">
@@ -1389,7 +1450,7 @@
               </label>
               <button class="primary-btn" type="submit">Zitat speichern</button>
             </form>
-            <p class="small muted">Neue Zitate können nur mit dem Camp-Passwort hinzugefügt werden.</p>
+            <p class="small muted">Neue Zitate können nur mit dem Camp-Passwort hinzugefügt werden. Hinweis: Bei einer statischen Website ist das ein einfacher Camp-Schutz, keine echte Admin-Sicherheit.</p>
           </article>
         </div>
       </div>
@@ -1402,7 +1463,7 @@
             <p class="eyebrow">Für die wichtigen Dinge</p>
             <h2 class="split-title"><span>Bier</span><span>Tracker</span></h2>
           </div>
-          <p>Track dein Bierkonsum übs Wochenende.</p>
+          <p>Lokale Zähler funktionieren sofort. Globale Zähler laufen über Firebase mit Anonymous Auth und validierten Security Rules.</p>
         </div>
 
         <div class="grid two">
@@ -1442,6 +1503,7 @@
             <p class="eyebrow">Was bisher geschah</p>
             <h2 class="split-title"><span>Bier</span><span>Stats</span></h2>
           </div>
+          <p>Keine externen Chart-Abhängigkeiten, keine kaputten Canvas-Plugins: einfache robuste CSS-Balken.</p>
         </div>
 
         <div class="grid two">
@@ -1501,6 +1563,7 @@
         <div class="grid three" style="margin-top:18px">
           <article class="card">
             <h3>👑 Kings Cup</h3>
+            <p class="small muted">Echtes 52er-Deck mit sichtbaren Karten, Ziehstapel, Regelanzeige und König-Zähler.</p>
             <div class="kc-area">
               <div class="kc-deck" aria-live="polite">
                 <div class="kc-card" id="kingCardVisual" aria-label="Kings-Cup-Karte">
@@ -1563,7 +1626,10 @@
         </div>
 
         <article class="card">
-          <div class="bingo-grid" id="bingoGrid" aria-label="Festival Bingo"></div>
+          <div class="bingo-scroll" aria-label="Festival Bingo: seitlich wischbarer Bereich">
+            <div class="bingo-grid" id="bingoGrid" aria-label="Festival Bingo"></div>
+          </div>
+          <p class="bingo-mobile-hint">Tipp: Auf sehr schmalen Displays kannst du das Bingo-Board seitlich wischen.</p>
           <div class="row-actions">
             <button class="primary-btn" type="button" id="bingoNewBtn">Neue Karte</button>
             <span class="pill" id="bingoStatus">Noch kein Bingo</span>
@@ -1579,6 +1645,7 @@
             <p class="eyebrow">Hinterlasse dein Zeichen</p>
             <h2 class="split-title"><span>Gäste</span><span>Buch</span></h2>
           </div>
+          <p>Benutzereingaben werden nicht per <code>innerHTML</code> gerendert. Firebase-Rules begrenzen Länge und Struktur.</p>
         </div>
 
         <div class="grid two">
@@ -1613,7 +1680,7 @@
             <p class="eyebrow">Erste Person auf 10.000 gewinnt</p>
             <h2 class="split-title"><span>Zehn</span><span>Tausend</span></h2>
           </div>
-          <p>Würfeln, wertende Würfel antippen, Auswahl behalten, Risiko nehmen oder Punkte kassieren.</p>
+          <p>Jetzt wieder wie ein richtiges 10.000-Spiel: würfeln, wertende Würfel antippen, Auswahl behalten, Risiko nehmen oder Punkte kassieren.</p>
         </div>
 
         <div class="grid two">
@@ -1698,7 +1765,7 @@
         lng: null
       },
       spotifyPlaylistId: "2OH5uA1XF39Ehe2Zzl1cet",
-      cooldownSec: 20,
+      cooldownSec: 30,
       quotePassword: "NR26",
       firebase: {
         enabled: true,
@@ -1725,7 +1792,7 @@
         },
         {
           name: "Michael",
-          role: "Stimmungsminister",
+          role: "Stimmungsminister ",
           bio: "Jonny an, Alltag aus.",
           emoji: "🥦",
           image: "fotos/Michael.jpg"
@@ -1747,16 +1814,12 @@
         {
           name: "Sina",
           role: "Playlist-Development",
-          bio: "Hat einen Song für jede Stimmung.",
-          emoji: "🎵",
+          bio: "Hat einen Song für jede Stimmung",
+          emoji: "🤘",
           image: "fotos/Sina.jpg"
         }
       ],
       quotes: [
-        "Nur kurz hinlegen.",
-        "Das ist kein Müll, das ist Camp-Deko.",
-        "Wer hat den Dosenöffner?",
-        "Wir gehen wirklich früh schlafen. Ganz sicher."
       ],
       tasks: [
       "Mach ein Gruppenfoto mit der Crew.",
