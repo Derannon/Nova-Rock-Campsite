@@ -98,3 +98,32 @@ Zehntausend nutzt diese Regeln:
 - bei Niete gehen alle Punkte des laufenden Zugs verloren
 - nach Erreichen von 10.000 bekommen alle anderen noch einen letzten Zug
 
+
+
+## Festival-Archiv / mehrere Festivals
+
+Diese Version kann mehrere Festivals über eine gemeinsame `index.html` darstellen. Oben rechts gibt es ein Festival-Archiv mit Suche nach Jahr und Festivalname.
+
+- Die Startseite ohne Parameter lädt automatisch das aktuelle bzw. zuletzt gepflegte Festival.
+- Einzelne Archivansichten werden über `?festival=<festival-id>` geöffnet, z. B. `?festival=nova-rock-2026`.
+- Jedes Festival bekommt über `firebase.rootPath` einen eigenen Datenbereich in Firebase.
+- `Rock am Beckenrand 2026` ist aktuell als nächstes Festival hinterlegt.
+- `Nova Rock 2026` bleibt als Archivansicht erhalten und nutzt weiterhin den bisherigen Firebase-Pfad `novaRockCamp/v2`.
+
+Neue Festivals ergänzt du in der `index.html` im Block `setupFestivalArchive()` in der Liste `archive`. Wichtig sind dort:
+
+```js
+id: "festival-slug-2027",
+year: 2027,
+title: "Festivalname 2027",
+festivalDays: ["2027-08-27", "2027-08-28"],
+config: {
+  campName: "Campname",
+  festivalLabel: "Festivalname 2027",
+  firebase: {
+    rootPath: "festivalArchive/festival-slug-2027"
+  }
+}
+```
+
+Wenn du echte Firebase-Synchronisierung nutzt, veröffentliche zusätzlich die aktuelle `firebase-rules.json` unter Firebase Realtime Database -> Rules.

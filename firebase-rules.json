@@ -74,6 +74,135 @@
             }
           }
         },
+        "quotes": {
+          "$quote": {
+            ".write": "auth != null && !data.exists()",
+            ".validate": "newData.hasChildren(['uid', 'text', 'createdAt']) && newData.child('uid').val() == auth.uid && newData.child('text').isString() && newData.child('text').val().length >= 1 && newData.child('text').val().length <= 120 && newData.child('createdAt').isNumber() && newData.child('createdAt').val() <= now + 5000",
+            "uid": {
+              ".validate": "newData.isString() && newData.val() == auth.uid"
+            },
+            "text": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 120"
+            },
+            "createdAt": {
+              ".validate": "newData.isNumber() && newData.val() <= now + 5000"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "visitorDevices": {
+          "$uid": {
+            ".read": "auth != null && auth.uid == $uid",
+            ".write": "auth != null && auth.uid == $uid",
+            ".validate": "newData.hasChildren(['createdAt', 'lastSeen', 'visits'])",
+            "createdAt": {
+              ".validate": "newData.isNumber() && ((!data.exists() && newData.val() <= now + 5000) || (data.exists() && newData.val() == data.val()))"
+            },
+            "lastSeen": {
+              ".validate": "newData.isNumber() && newData.val() <= now + 5000"
+            },
+            "visits": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && ((!data.exists() && newData.val() == 1) || (data.exists() && newData.val() == data.val() + 1))"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        }
+      }
+    },
+    "festivalArchive": {
+      "$festivalId": {
+        ".read": true,
+        ".write": false,
+        "public": {
+          "totalBeers": {
+            ".write": "auth != null",
+            ".validate": "newData.isNumber() && newData.val() >= 0 && ((!data.exists() && newData.val() == 1) || (data.exists() && newData.val() == data.val() + 1))"
+          },
+          "visitors": {
+            ".write": "auth != null && !root.child('festivalArchive/' + $festivalId + '/visitorDevices/' + auth.uid).exists()",
+            ".validate": "newData.isNumber() && newData.val() >= 0 && ((!data.exists() && newData.val() == 1) || (data.exists() && newData.val() == data.val() + 1))"
+          },
+          "byDay": {
+            "$day": {
+              ".write": "auth != null",
+              ".validate": "$day.matches(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) && newData.isNumber() && newData.val() >= 0 && ((!data.exists() && newData.val() == 1) || (data.exists() && newData.val() == data.val() + 1))"
+            }
+          },
+          "byHour": {
+            "$day": {
+              "$hour": {
+                ".write": "auth != null",
+                ".validate": "$day.matches(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) && $hour.matches(/^([01][0-9]|2[0-3])$/) && newData.isNumber() && newData.val() >= 0 && ((!data.exists() && newData.val() == 1) || (data.exists() && newData.val() == data.val() + 1))"
+              }
+            }
+          },
+          "$other": {
+            ".validate": false
+          }
+        },
+        "users": {
+          "$uid": {
+            ".read": "auth != null && auth.uid == $uid",
+            ".write": "auth != null && auth.uid == $uid",
+            "totalBeers": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && ((!data.exists() && newData.val() == 1) || (data.exists() && newData.val() == data.val() + 1))"
+            },
+            "byDay": {
+              "$day": {
+                ".validate": "$day.matches(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) && newData.isNumber() && newData.val() >= 0 && ((!data.exists() && newData.val() == 1) || (data.exists() && newData.val() == data.val() + 1))"
+              }
+            },
+            "lastBeerAt": {
+              ".validate": "newData.isNumber() && newData.val() <= now + 5000"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "guestbook": {
+          "$entry": {
+            ".write": "auth != null && !data.exists()",
+            ".validate": "newData.hasChildren(['uid', 'name', 'message', 'createdAt']) && newData.child('uid').val() == auth.uid && newData.child('name').isString() && newData.child('name').val().length >= 1 && newData.child('name').val().length <= 32 && newData.child('message').isString() && newData.child('message').val().length >= 1 && newData.child('message').val().length <= 240 && newData.child('createdAt').isNumber() && newData.child('createdAt').val() <= now + 5000",
+            "uid": {
+              ".validate": "newData.isString() && newData.val() == auth.uid"
+            },
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 32"
+            },
+            "message": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 240"
+            },
+            "createdAt": {
+              ".validate": "newData.isNumber() && newData.val() <= now + 5000"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "quotes": {
+          "$quote": {
+            ".write": "auth != null && !data.exists()",
+            ".validate": "newData.hasChildren(['uid', 'text', 'createdAt']) && newData.child('uid').val() == auth.uid && newData.child('text').isString() && newData.child('text').val().length >= 1 && newData.child('text').val().length <= 120 && newData.child('createdAt').isNumber() && newData.child('createdAt').val() <= now + 5000",
+            "uid": {
+              ".validate": "newData.isString() && newData.val() == auth.uid"
+            },
+            "text": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 120"
+            },
+            "createdAt": {
+              ".validate": "newData.isNumber() && newData.val() <= now + 5000"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
         "visitorDevices": {
           "$uid": {
             ".read": "auth != null && auth.uid == $uid",
